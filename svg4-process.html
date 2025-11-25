@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG4 制作过程详解</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #eab54f, #1f8aa6);
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .process-steps {
+            padding: 30px 40px;
+        }
+        
+        .step {
+            margin-bottom: 60px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .step:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #eab54f, #1f8aa6);
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .step-title {
+            font-size: 1.4rem;
+            color: #2c3e50;
+        }
+        
+        .step-description {
+            margin-bottom: 25px;
+            color: #555;
+            line-height: 1.7;
+        }
+        
+        .svg-container {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .code-container {
+            background: #2d3748;
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .code-comment {
+            color: #a0aec0;
+        }
+        
+        .code-tag {
+            color: #63b3ed;
+        }
+        
+        .code-attr {
+            color: #fbb6ce;
+        }
+        
+        .code-value {
+            color: #68d391;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding: 20px 40px;
+            background: #f8f9fa;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+        }
+        
+        .nav-btn.back {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            box-shadow: 0 2px 8px rgba(149, 165, 166, 0.3);
+        }
+        
+        .nav-btn.back:hover {
+            box-shadow: 0 4px 12px rgba(149, 165, 166, 0.4);
+        }
+        
+        .icon {
+            margin-right: 8px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .process-steps {
+                padding: 20px;
+            }
+            
+            header {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-btn {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SVG4 制作过程详解</h1>
+            <p class="subtitle">探索概率密度函数图表的完整制作流程</p>
+        </header>
+        
+        <div class="process-steps">
+            <!-- 步骤1 -->
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <h2 class="step-title">创建画布并建立坐标系</h2>
+                </div>
+                <p class="step-description">
+                    首先创建一个900x700像素的SVG画布，并在其中建立直角坐标系。坐标系的范围是X轴从-2到5，Y轴从0到0.35。这个坐标系将用于绘制概率密度函数曲线。
+                </p>
+                <div class="svg-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="300" viewBox="0 0 900 300" style="background: #f8f9fa;">
+                        <!-- 坐标系 -->
+                        <rect x="180" y="50" width="550" height="200" fill="#ffffff" stroke="#e5e7eb" stroke-width="2"/>
+                        
+                        <!-- 网格线 -->
+                        <g stroke="#e5e7eb" stroke-width="1">
+                            <path d="M250 50 V250 M320 50 V250 M390 50 V250 M460 50 V250 M530 50 V250 M600 50 V250 M670 50 V250"/>
+                            <path d="M180 100 H730 M180 150 H730 M180 200 H730"/>
+                        </g>
+                        
+                        <!-- 坐标轴 -->
+                        <g stroke="#111827" stroke-width="2">
+                            <line x1="180" y1="250" x2="730" y2="250"/>
+                            <polygon points="730,250 710,240 710,260" fill="#111827"/>
+                            <line x1="180" y1="250" x2="180" y2="50"/>
+                            <polygon points="180,50 172,64 188,64" fill="#111827"/>
+                        </g>
+                        
+                        <!-- 刻度 -->
+                        <g font-family="system-ui" fill="#374151" font-size="14">
+                            <g text-anchor="middle">
+                                <text x="180" y="270">-2</text>
+                                <text x="250" y="270">-1</text>
+                                <text x="320" y="270">0</text>
+                                <text x="390" y="270">1</text>
+                                <text x="460" y="270">2</text>
+                                <text x="530" y="270">3</text>
+                                <text x="600" y="270">4</text>
+                                <text x="670" y="270">5</text>
+                            </g>
+                            <g text-anchor="end">
+                                <text x="170" y="100">0.35</text>
+                                <text x="170" y="150">0.175</text>
+                                <text x="170" y="200">0.00</text>
+                            </g>
+                        </g>
+                        
+                        <!-- 标题 -->
+                        <text x="450" y="30" text-anchor="middle" font-family="system-ui" font-size="16" fill="#2c3e50">步骤1：创建画布与坐标系</text>
+                    </svg>
+                </div>
+                <div class="code-container">
+                    <span class="code-comment">&lt;!-- 创建SVG画布和坐标系 --&gt;</span><br>
+                    <span class="code-tag">&lt;svg</span> <span class="code-attr">xmlns=</span><span class="code-value">"http://www.w3.org/2000/svg"</span> <span class="code-attr">width=</span><span class="code-value">"450"</span> <span class="code-attr">height=</span><span class="code-value">"600"</span> <span class="code-attr">viewBox=</span><span class="code-value">"0 0 900 700"</span><span class="code-tag">&gt;</span><br>
+                    &nbsp;&nbsp;<span class="code-tag">&lt;g</span> <span class="code-attr">id=</span><span class="code-value">"plot4"</span> <span class="code-attr">transform=</span><span class="code-value">"translate(180,170)"</span><span class="code-tag">&gt;</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-tag">&lt;rect</span> <span class="code-attr">x=</span><span class="code-value">"0"</span> <span class="code-attr">y=</span><span class="code-value">"0"</span> <span class="code-attr">width=</span><span class="code-value">"550"</span> <span class="code-attr">height=</span><span class="code-value">"380"</span> <span class="code-attr">fill=</span><span class="code-value">"#ffffff"</span> <span class="code-attr">stroke=</span><span class="code-value">"#e5e7eb"</span> <span class="code-attr">stroke-width=</span><span class="code-value">"2"</span><span class="code-tag">/&gt;</span><br>
+                    &nbsp;&nbsp;<span class="code-tag">&lt;/g&gt;</span><br>
+                    <span class="code-tag">&lt;/svg&gt;</span>
+                </div>
+            </div>
+            
+            <!-- 步骤2 -->
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <h2 class="step-title">建立X轴和Y轴</h2>
+                </div>
+                <p class="step-description">
+                    在画布上添加完整的X轴和Y轴，包括刻度线和标签。X轴表示变量x的取值范围，Y轴表示概率密度值。添加网格线以便更准确地读取数值。
+                </p>
+                <div class="svg-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="300" viewBox="0 0 900 300" style="background: #f8f9fa;">
+                        <!-- 坐标系 -->
+                        <rect x="180" y="50" width="550" height="200" fill="#ffffff" stroke="#e5e7eb" stroke-width="2"/>
+                        
+                        <!-- 网格线 -->
+                        <g stroke="#e5e7eb" stroke-width="1">
+                            <path d="M250 50 V250 M320 50 V250 M390 50 V250 M460 50 V250 M530 50 V250 M600 50 V250 M670 50 V250"/>
+                            <path d="M180 100 H730 M180 150 H730 M180 200 H730"/>
+                        </g>
+                        
+                        <!-- 坐标轴 -->
+                        <g stroke="#111827" stroke-width="2">
+                            <line x1="180" y1="250" x2="730" y2="250"/>
+                            <polygon points="730,250 710,240 710,260" fill="#111827"/>
+                            <line x1="180" y1="250" x2="180" y2="50"/>
+                            <polygon points="180,50 172,64 188,64" fill="#111827"/>
+                        </g>
+                        
+                        <!-- 刻度线 -->
+                        <g stroke="#111827" stroke-width="2">
+                            <path d="M180 250 v-8 M250 250 v-8 M320 250 v-8 M390 250 v-8 M460 250 v-8 M530 250 v-8 M600 250 v-8 M670 250 v-8"/>
+                            <path d="M180 200 h8 M180 150 h8 M180 100 h8"/>
+                        </g>
+                        
+                        <!-- 刻度标签 -->
+                        <g font-family="system-ui" fill="#374151" font-size="14">
+                            <g text-anchor="middle">
+                                <text x="180" y="270">-2</text>
+                                <text x="250" y="270">-1</text>
+                                <text x="320" y="270">0</text>
+                                <text x="390" y="270">1</text>
+                                <text x="460" y="270">2</text>
+                                <text x="530" y="270">3</text>
+                                <text x="600" y="270">4</text>
+                                <text x="670" y="270">5</text>
+                            </g>
+                            <g text-anchor="end">
+                                <text x="170" y="100">0.35</text>
+                                <text x="170" y="150">0.175</text>
+                                <text x="170" y="200">0.00</text>
+                            </g>
+                        </g>
+                        
+                        <!-- 轴标签 -->
+                        <text x="455" y="290" text-anchor="middle" font-family="system-ui" font-size="14" fill="#374151">x</text>
+                        <text x="160" y="150" text-anchor="middle" font-family="system-ui" font-size="14" fill="#374151" transform="rotate(-90, 160, 150)">p(x)</text>
+                        
+                        <!-- 标题 -->
+                        <text x="450" y="30" text-anchor="middle" font-family="system-ui" font-size="16" fill="#2c3e50">步骤2：建立X轴和Y轴</text>
+                    </svg>
+                </div>
+                <div class="code-container">
+                    <span class="code-comment">&lt;!-- 添加坐标轴和刻度 --&gt;</span><br>
+                    <span class="code-tag">&lt;g</span> <span class="code-attr">stroke=</span><span class="code-value">"#111827"</span> <span class="code-attr">stroke-width=</span><span class="code-value">"2"</span><span class="code-tag">&gt;</span><br>
+                    &nbsp;&nbsp;<span class="code-tag">&lt;line</span> <span class="code-attr">x1=</span><span class="code-value">"0"</span> <span class="code-attr">y1=</span><span class="code-value">"380"</span> <span class="code-attr">x2=</span><span class="code-value">"540"</span> <span class="code-attr">y2=</span><span class="code-value">"380"</span><span class="code-tag">/&gt;</span><br>
+                    &nbsp;&nbsp;<span class="code-tag">&lt;polygon</span> <span class="code-attr">points=</span><span class="code-value">"540,380 520,370 520,390"</span> <span class="code-attr">fill=</span><span class="code-value">"#111827"</span><span class="code-tag">/&gt;</span><br>
+                    &nbsp;&nbsp;<span class="code-tag">&lt;line</span> <span class="code-attr">x1=</span><span class="code-value">"0"</span> <span class="code-attr">y1=</span><span class="code-value">"380"</span> <span class="code-attr">x2=</span><span class="code-value">"0"</span> <span class="code-attr">y2=</span><span class="code-value">"0"</span><span class="code-tag">/&gt;</span><br>
+                    &nbsp;&nbsp;<span class="code-tag">&lt;polygon</span> <span class="code-attr">points=</span><span class="code-value">"0,0  -8,14  8,14"</span> <span class="code-attr">fill=</span><span class="code-value">"#111827"</span><span class="code-tag">/&gt;</span><br>
+                    <span class="code-tag">&lt;/g&gt;</span>
+                </div>
+            </div>
+            
+            <!-- 步骤3 -->
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <h2 class="step-title">绘制黄色和青色概率密度曲线</h2>
+                </div>
+                <p class="step-description">
+                    基于概率密度函数绘制两条曲线：黄色曲线表示p(x, y=0)·ν(x)，青色曲线表示p(x, y=1)·ν(x)。这两条曲线通过数学函数计算得到，并添加了渐变效果和动画。
+                </p>
+                <div class="svg-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="300" viewBox="0 0 900 300" style="background: #f8f9fa;">
+                        <!-- 坐标系 -->
+                        <rect x="180" y="50" width="550" height="200" fill="#ffffff" stroke="#e5e7eb" stroke-width="2"/>
+                        
+                        <!-- 网格线 -->
+                        <g stroke="#e5e7eb" stroke-width="1">
+                            <path d="M250 50 V250 M320 50 V250 M390 50 V250 M460 50 V250 M530 50 V250 M600 50 V250 M670 50 V250"/>
+                            <path d="M180 100 H730 M180 150 H730 M180 200 H730"/>
+                        </g>
+                        
+                        <!-- 坐标轴 -->
+                        <g stroke="#111827" stroke-width="2">
+                            <line x1="180" y1="250" x2="730" y2="250"/>
+                            <polygon points="730,250 710,240 710,260" fill="#111827"/>
+                            <line x1="180" y1="250" x2="180" y2="50"/>
+                            <polygon points="180,50 172,64 188,64" fill="#111827"/>
+                        </g>
+                        
+                        <!-- 刻度 -->
+                        <g font-family="system-ui" fill="#374151" font-size="14">
+                            <g text-anchor="middle">
+                                <text x="180" y="270">-2</text>
+                                <text x="250" y="270">-1</text>
+                                <text x="320" y="270">0</text>
+                                <text x="390" y="270">1</text>
+                                <text x="460" y="270">2</text>
+                                <text x="530" y="270">3</text>
+                                <text x="600" y="270">4</text>
+                                <text x="670" y="270">5</text>
+                            </g>
+                            <g text-anchor="end">
+                                <text x="170" y="100">0.35</text>
+                                <text x="170" y="150">0.175</text>
+                                <text x="170" y="200">0.00</text>
+                            </g>
+                        </g>
+                        
+                        <!-- 黄色曲线 -->
+                        <path d="M180,250 C220,200 280,180 320,150 C360,120 400,100 450,120 C500,140 550,160 600,180 C650,200 700,220 730,230" 
+                              fill="none" stroke="#eab54f" stroke-width="3" opacity="0.9"/>
+                        
+                        <!-- 青色曲线 -->
+                        <path d="M180,250 C220,240 280,220 320,200 C360,180 400,160 450,120 C500,80 550,70 600,90 C650,110 700,130 730,140" 
+                              fill="none" stroke="#1f8aa6" stroke-width="3" opacity="0.9"/>
+                        
+                        <!-- 图例 -->
+                        <g font-family="system-ui" font-size="14" fill="#111827">
+                            <rect x="400" y="70" width="20" height="4" fill="#eab54f"/>
+                            <text x="425" y="75">黄色：p(x, y = 0) · ν(x)</text>
+                            <rect x="400" y="90" width="20" height="4" fill="#1f8aa6"/>
+                            <text x="425" y="95">青色：p(x, y = 1) · ν(x)</text>
+                        </g>
+                        
+                        <!-- 标题 -->
+                        <text x="450" y="30" text-anchor="middle" font-family="system-ui" font-size="16" fill="#2c3e50">步骤3：绘制概率密度曲线</text>
+                    </svg>
+                </div>
+                <div class="code-container">
+                    <span class="code-comment">&lt;!-- 绘制概率密度曲线 --&gt;</span><br>
+                    <span class="code-tag">&lt;path</span> <span class="code-attr">id=</span><span class="code-value">"curve0"</span> <span class="code-attr">fill=</span><span class="code-value">"none"</span> <span class="code-attr">stroke=</span><span class="code-value">"#eab54f"</span> <span class="code-attr">stroke-width=</span><span class="code-value">"3.5"</span> <span class="code-attr">opacity=</span><span class="code-value">"0.98"</span><span class="code-tag">/&gt;</span><br>
+                    <span class="code-tag">&lt;path</span> <span class="code-attr">id=</span><span class="code-value">"curve1"</span> <span class="code-attr">fill=</span><span class="code-value">"none"</span> <span class="code-attr">stroke=</span><span class="code-value">"#1f8aa6"</span> <span class="code-attr">stroke-width=</span><span class="code-value">"3.5"</span> <span class="code-attr">opacity=</span><span class="code-value">"0.98"</span><span class="code-tag">/&gt;</span><br>
+                    <br>
+                    <span class="code-comment">&lt;!-- JavaScript函数计算曲线点 --&gt;</span><br>
+                    <span class="code-tag">&lt;script&gt;</span><br>
+                    &nbsp;&nbsp;<span class="code-comment">// 计算黄色曲线</span><br>
+                    &nbsp;&nbsp;<span class="code-tag">function</span> evalYellow(x) {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-tag">const</span> base = 0.22*Math.exp(-Math.pow((x-0.25)/1.2,2));<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-tag">const</span> cross= 0.13*Math.exp(-Math.pow((x-1.1)/0.22,2));<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-tag">return</span> Math.max(0, Math.min(0.35, Math.max(base,cross)));<br>
+                    &nbsp;&nbsp;}<br>
+                    <span class="code-tag">&lt;/script&gt;</span>
+                </div>
+            </div>
+            
+            <!-- 步骤4 -->
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">4</div>
+                    <h2 class="step-title">添加阈值虚线</h2>
+                </div>
+                <p class="step-description">
+                    在X轴的1位置左右两侧0.3处添加两条垂直虚线，表示决策边界。这些虚线有助于可视化分类阈值，并标记曲线相交的区域。
+                </p>
+                <div class="svg-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="300" viewBox="0 0 900 300" style="background: #f8f9fa;">
+                        <!-- 坐标系 -->
+                        <rect x="180" y="50" width="550" height="200" fill="#ffffff" stroke="#e5e7eb" stroke-width="2"/>
+                        
+                        <!-- 网格线 -->
+                        <g stroke="#e5e7eb" stroke-width="1">
+                            <path d="M250 50 V250 M320 50 V250 M390 50 V250 M460 50 V250 M530 50 V250 M600 50 V250 M670 50 V250"/>
+                            <path d="M180 100 H730 M180 150 H730 M180 200 H730"/>
+                        </g>
+                        
+                        <!-- 坐标轴 -->
+                        <g stroke="#111827" stroke-width="2">
+                            <line x1="180" y1="250" x2="730" y2="250"/>
+                            <polygon points="730,250 710,240 710,260" fill="#111827"/>
+                            <line x1="180" y1="250" x2="180" y2="50"/>
+                            <polygon points="180,50 172,64 188,64" fill="#111827"/>
+                        </g>
+                        
+                        <!-- 刻度 -->
+                        <g font-family="system-ui" fill="#374151" font-size="14">
+                            <g text-anchor="middle">
+                                <text x="180" y="270">-2</text>
+                                <text x="250" y="270">-1</text>
+                                <text x="320" y="270">0</text>
+                                <text x="390" y="270">1</text>
+                                <text x="460" y="270">2</text>
+                                <text x="530" y="270">3</text>
+                                <text x="600" y="270">4</text>
+                                <text x="670" y="270">5</text>
+                            </g>
+                            <g text-anchor="end">
+                                <text x="170" y="100">0.35</text>
+                                <text x="170" y="150">0.175</text>
+                                <text x="170" y="200">0.00</text>
+                            </g>
+                        </g>
+                        
+                        <!-- 黄色曲线 -->
+                        <path d="M180,250 C220,200 280,180 320,150 C360,120 400,100 450,120 C500,140 550,160 600,180 C650,200 700,220 730,230" 
+                              fill="none" stroke="#eab54f" stroke-width="3" opacity="0.9"/>
+                        
+                        <!-- 青色曲线 -->
+                        <path d="M180,250 C220,240 280,220 320,200 C360,180 400,160 450,120 C500,80 550,70 600,90 C650,110 700,130 730,140" 
+                              fill="none" stroke="#1f8aa6" stroke-width="3" opacity="0.9"/>
+                        
+                        <!-- 阈值虚线 -->
+                        <line x1="320" y1="50" x2="320" y2="250" stroke="#111827" stroke-width="2" stroke-dasharray="8 8" opacity="0.85"/>
+                        <line x1="390" y1="50" x2="390" y2="250" stroke="#111827" stroke-width="2" stroke-dasharray="8 8" opacity="0.85"/>
+                        
+                        <!-- 阈值标签 -->
+                        <text x="320" y="270" text-anchor="middle" font-family="system-ui" font-size="14" fill="#374151">0.7</text>
+                        <text x="390" y="270" text-anchor="middle" font-family="system-ui" font-size="14" fill="#374151">1.3</text>
+                        
+                        <!-- 标题 -->
+                        <text x="450" y="30" text-anchor="middle" font-family="system-ui" font-size="16" fill="#2c3e50">步骤4：添加阈值虚线</text>
+                    </svg>
+                </div>
+                <div class="code-container">
+                    <span class="code-comment">&lt;!-- 添加阈值虚线 --&gt;</span><br>
+                    <span class="code-tag">&lt;g</span> <span class="code-attr">stroke=</span><span class="code-value">"#111827"</span> <span class="code-attr">stroke-width=</span><span class="code-value">"2"</span> <span class="code-attr">stroke-dasharray=</span><span class="code-value">"8 8"</span> <span class="code-attr">opacity=</span><span class="code-value">"0.85"</span><span class="code-tag">&gt;</span><br>
+                    &nbsp;&nbsp;<span class="code-tag">&lt;line</span> <span class="code-attr">x1=</span><span class="code-value">"189"</span> <span class="code-attr">y1=</span><span class="code-value">"380"</span> <span class="code-attr">x2=</span><span class="code-value">"189"</span> <span class="code-attr">y2=</span><span class="code-value">"40"</span><span class="code-tag">/&gt;</span><br>
+                    &nbsp;&nbsp;<span class="code-tag">&lt;line</span> <span class="code-attr">x1=</span><span class="code-value">"231"</span> <span class="code-attr">y1=</span><span class="code-value">"380"</span> <span class="code-attr">x2=</span><span class="code-value">"231"</span> <span class="code-attr">y2=</span><span class="code-value">"40"</span><span class="code-tag">/&gt;</span><br>
+                    <span class="code-tag">&lt;/g&gt;</span>
+                </div>
+            </div>
+            
+            <!-- 步骤5 -->
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">5</div>
+                    <h2 class="step-title">计算并绘制重叠区域</h2>
+                </div>
+                <p class="step-description">
+                    计算两条曲线重叠的区域，并使用灰色半透明多边形填充这个区域。这个重叠区域表示两个概率密度函数同时具有显著值的区间，在分类问题中具有特殊意义。
+                </p>
+                <div class="svg-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="300" viewBox="0 0 900 300" style="background: #f8f9fa;">
+                        <!-- 坐标系 -->
+                        <rect x="180" y="50" width="550" height="200" fill="#ffffff" stroke="#e5e7eb" stroke-width="2"/>
+                        
+                        <!-- 网格线 -->
+                        <g stroke="#e5e7eb" stroke-width="1">
+                            <path d="M250 50 V250 M320 50 V250 M390 50 V250 M460 50 V250 M530 50 V250 M600 50 V250 M670 50 V250"/>
+                            <path d="M180 100 H730 M180 150 H730 M180 200 H730"/>
+                        </g>
+                        
+                        <!-- 坐标轴 -->
+                        <g stroke="#111827" stroke-width="2">
+                            <line x1="180" y1="250" x2="730" y2="250"/>
+                            <polygon points="730,250 710,240 710,260" fill="#111827"/>
+                            <line x1="180" y1="250" x2="180" y2="50"/>
+                            <polygon points="180,50 172,64 188,64" fill="#111827"/>
+                        </g>
+                        
+                        <!-- 刻度 -->
+                        <g font-family="system-ui" fill="#374151" font-size="14">
+                            <g text-anchor="middle">
+                                <text x="180" y="270">-2</text>
+                                <text x="250" y="270">-1</text>
+                                <text x="320" y="270">0</text>
+                                <text x="390" y="270">1</text>
+                                <text x="460" y="270">2</text>
+                                <text x="530" y="270">3</text>
+                                <text x="600" y="270">4</text>
+                                <text x="670" y="270">5</text>
+                            </g>
+                            <g text-anchor="end">
+                                <text x="170" y="100">0.35</text>
+                                <text x="170" y="150">0.175</text>
+                                <text x="170" y="200">0.00</text>
+                            </g>
+                        </g>
+                        
+                        <!-- 黄色曲线 -->
+                        <path d="M180,250 C220,200 280,180 320,150 C360,120 400,100 450,120 C500,140 550,160 600,180 C650,200 700,220 730,230" 
+                              fill="none" stroke="#eab54f" stroke-width="3" opacity="0.9"/>
+                        
+                        <!-- 青色曲线 -->
+                        <path d="M180,250 C220,240 280,220 320,200 C360,180 400,160 450,120 C500,80 550,70 600,90 C650,110 700,130 730,140" 
+                              fill="none" stroke="#1f8aa6" stroke-width="3" opacity="0.9"/>
+                        
+                        <!-- 阈值虚线 -->
+                        <line x1="320" y1="50" x2="320" y2="250" stroke="#111827" stroke-width="2" stroke-dasharray="8 8" opacity="0.85"/>
+                        <line x1="390" y1="50" x2="390" y2="250" stroke="#111827" stroke-width="2" stroke-dasharray="8 8" opacity="0.85"/>
+                        
+                        <!-- 重叠区域 -->
+                        <polygon points="320,150 340,140 360,130 380,125 400,120 420,115 440,110 460,105 480,100 500,95 520,90 540,85 560,80 580,75 600,70 620,65 640,60 660,55 680,50 680,250 320,250" 
+                                 fill="#6b7280" fill-opacity="0.45" stroke="none"/>
+                        
+                        <!-- 标题 -->
+                        <text x="450" y="30" text-anchor="middle" font-family="system-ui" font-size="16" fill="#2c3e50">步骤5：绘制重叠区域</text>
+                    </svg>
+                </div>
+                <div class="code-container">
+                    <span class="code-comment">&lt;!-- 计算并绘制重叠区域 --&gt;</span><br>
+                    <span class="code-tag">&lt;polygon</span> <span class="code-attr">id=</span><span class="code-value">"overlap"</span> <span class="code-attr">fill=</span><span class="code-value">"#6b7280"</span> <span class="code-attr">fill-opacity=</span><span class="code-value">"0.45"</span> <span class="code-attr">stroke=</span><span class="code-value">"none"</span><span class="code-tag">/&gt;</span><br>
+                    <br>
+                    <span class="code-comment">&lt;!-- JavaScript计算重叠区域 --&gt;</span><br>
+                    <span class="code-tag">&lt;script&gt;</span><br>
+                    &nbsp;&nbsp;<span class="code-comment">// 阴影（真实重叠）区间</span><br>
+                    &nbsp;&nbsp;<span class="code-tag">const</span> xL = -0.7, xR = 3, step = 0.02, top = [];<br>
+                    &nbsp;&nbsp;<span class="code-tag">for</span>(let x = xL; x <= xR + 1e-12; x += step) { <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-tag">const</span> y = Math.min(evalYellow(x), evalCyan(x)); <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;top.push([x2px(x), y2px(y)]); <br>
+                    &nbsp;&nbsp;}<br>
+                    &nbsp;&nbsp;top.push([x2px(xR), y0px]); <br>
+                    &nbsp;&nbsp;top.push([x2px(xL), y0px]);<br>
+                    <br>
+                    &nbsp;&nbsp;document.getElementById('overlap').setAttribute('points', <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;top.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" "));<br>
+                    <span class="code-tag">&lt;/script&gt;</span>
+                </div>
+            </div>
+            
+            <!-- 步骤6 -->
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">6</div>
+                    <h2 class="step-title">添加标记和动画效果</h2>
+                </div>
+                <p class="step-description">
+                    最后，添加交点标记并使用CSS和JavaScript添加动画效果。包括曲线绘制动画、重叠区域呼吸效果、交点闪烁动画以及悬停交互效果，使图表更加生动和直观。
+                </p>
+                <div class="svg-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="300" viewBox="0 0 900 300" style="background: #f8f9fa;">
+                        <!-- 坐标系 -->
+                        <rect x="180" y="50" width="550" height="200" fill="#ffffff" stroke="#e5e7eb" stroke-width="2"/>
+                        
+                        <!-- 网格线 -->
+                        <g stroke="#e5e7eb" stroke-width="1">
+                            <path d="M250 50 V250 M320 50 V250 M390 50 V250 M460 50 V250 M530 50 V250 M600 50 V250 M670 50 V250"/>
+                            <path d="M180 100 H730 M180 150 H730 M180 200 H730"/>
+                        </g>
+                        
+                        <!-- 坐标轴 -->
+                        <g stroke="#111827" stroke-width="2">
+                            <line x1="180" y1="250" x2="730" y2="250"/>
+                            <polygon points="730,250 710,240 710,260" fill="#111827"/>
+                            <line x1="180" y1="250" x2="180" y2="50"/>
+                            <polygon points="180,50 172,64 188,64" fill="#111827"/>
+                        </g>
+                        
+                        <!-- 刻度 -->
+                        <g font-family="system-ui" fill="#374151" font-size="14">
+                            <g text-anchor="middle">
+                                <text x="180" y="270">-2</text>
+                                <text x="250" y="270">-1</text>
+                                <text x="320" y="270">0</text>
+                                <text x="390" y="270">1</text>
+                                <text x="460" y="270">2</text>
+                                <text x="530" y="270">3</text>
+                                <text x="600" y="270">4</text>
+                                <text x="670" y="270">5</text>
+                            </g>
+                            <g text-anchor="end">
+                                <text x="170" y="100">0.35</text>
+                                <text x="170" y="150">0.175</text>
+                                <text x="170" y="200">0.00</text>
+                            </g>
+                        </g>
+                        
+                        <!-- 黄色曲线 -->
+                        <path d="M180,250 C220,200 280,180 320,150 C360,120 400,100 450,120 C500,140 550,160 600,180 C650,200 700,220 730,230" 
+                              fill="none" stroke="#eab54f" stroke-width="3" opacity="0.9"/>
+                        
+                        <!-- 青色曲线 -->
+                        <path d="M180,250 C220,240 280,220 320,200 C360,180 400,160 450,120 C500,80 550,70 600,90 C650,110 700,130 730,140" 
+                              fill="none" stroke="#1f8aa6" stroke-width="3" opacity="0.9"/>
+                        
+                        <!-- 阈值虚线 -->
+                        <line x1="320" y1="50" x2="320" y2="250" stroke="#111827" stroke-width="2" stroke-dasharray="8 8" opacity="0.85"/>
+                        <line x1="390" y1="50" x2="390" y2="250" stroke="#111827" stroke-width="2" stroke-dasharray="8 8" opacity="0.85"/>
+                        
+                        <!-- 重叠区域 -->
+                        <polygon points="320,150 340,140 360,130 380,125 400,120 420,115 440,110 460,105 480,100 500,95 520,90 540,85 560,80 580,75 600,70 620,65 640,60 660,55 680,50 680,250 320,250" 
+                                 fill="#6b7280" fill-opacity="0.45" stroke="none"/>
+                        
+                        <!-- 交点标记 -->
+                        <circle cx="450" cy="120" r="8" fill="#6b7280" opacity="0.25"/>
+                        <circle cx="450" cy="120" r="3" fill="#6b7280"/>
+                        
+                        <!-- 图例 -->
+                        <g font-family="system-ui" font-size="14" fill="#111827">
+                            <rect x="400" y="70" width="20" height="4" fill="#eab54f"/>
+                            <text x="425" y="75">黄色：p(x, y = 0) · ν(x)</text>
+                            <rect x="400" y="90" width="20" height="4" fill="#1f8aa6"/>
+                            <text x="425" y="95">青色：p(x, y = 1) · ν(x)</text>
+                        </g>
+                        
+                        <!-- 标题 -->
+                        <text x="450" y="30" text-anchor="middle" font-family="system-ui" font-size="16" fill="#2c3e50">步骤6：添加标记和动画效果</text>
+                    </svg>
+                </div>
+                <div class="code-container">
+                    <span class="code-comment">&lt;!-- 添加交点和动画效果 --&gt;</span><br>
+                    <span class="code-tag">&lt;circle</span> <span class="code-attr">id=</span><span class="code-value">"xpointGlow"</span> <span class="code-attr">cx=</span><span class="code-value">"213"</span> <span class="code-attr">cy=</span><span class="code-value">"237"</span> <span class="code-attr">r=</span><span class="code-value">"8"</span><span class="code-tag">/&gt;</span><br>
+                    <span class="code-tag">&lt;circle</span> <span class="code-attr">id=</span><span class="code-value">"xpoint"</span> <span class="code-attr">cx=</span><span class="code-value">"213"</span> <span class="code-attr">cy=</span><span class="code-value">"237"</span> <span class="code-attr">r=</span><span class="code-value">"3"</span><span class="code-tag">/&gt;</span><br>
+                    <br>
+                    <span class="code-comment">&lt;!-- CSS动画 --&gt;</span><br>
+                    <span class="code-tag">&lt;style&gt;</span><br>
+                    &nbsp;&nbsp;<span class="code-comment">/* 曲线绘制动画 */</span><br>
+                    &nbsp;&nbsp;<span class="code-tag">#svg4</span> <span class="code-tag">#curve0</span>, <span class="code-tag">#svg4</span> <span class="code-tag">#curve1</span> {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-attr">stroke-linecap</span>: <span class="code-value">round</span>;<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-attr">stroke-linejoin</span>: <span class="code-value">round</span>;<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-attr">animation</span>: <span class="code-value">draw 30s ease-in-out infinite</span>;<br>
+                    &nbsp;&nbsp;}<br>
+                    <br>
+                    &nbsp;&nbsp;<span class="code-comment">/* 重叠区域呼吸效果 */</span><br>
+                    &nbsp;&nbsp;<span class="code-tag">#svg4</span> <span class="code-tag">#overlap</span> {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-attr">animation</span>: <span class="code-value">breathe 3.2s ease-in-out infinite</span>;<br>
+                    &nbsp;&nbsp;}<br>
+                    <br>
+                    &nbsp;&nbsp;<span class="code-comment">/* 交点闪烁动画 */</span><br>
+                    &nbsp;&nbsp;<span class="code-tag">#svg4</span> <span class="code-tag">#xpointGlow</span> {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-attr">animation</span>: <span class="code-value">blink 1.6s ease-in-out infinite</span>;<br>
+                    &nbsp;&nbsp;}<br>
+                    <span class="code-tag">&lt;/style&gt;</span>
+                </div>
+            </div>
+        </div>
+        
+   </body>
+</html>

@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG2 制作过程 - Assignment3</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+        
+        .process-steps {
+            padding: 40px;
+        }
+        
+        .step {
+            margin-bottom: 50px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+            transition: transform 0.3s ease;
+        }
+        
+        .step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            margin-right: 12px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);
+        }
+        
+        .step-title {
+            font-size: 1.4rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        
+        .step-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .step-image {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .step-image img {
+            max-width: 100%;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        
+        .step-description {
+            padding: 10px 0;
+        }
+        
+        .step-description p {
+            margin-bottom: 15px;
+            color: #555;
+        }
+        
+        .key-points {
+            background: #e8f4fc;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border-left: 3px solid #3498db;
+        }
+        
+        .key-points strong {
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .key-points ul {
+            padding-left: 20px;
+            margin: 0;
+        }
+        
+        .key-points li {
+            margin-bottom: 5px;
+        }
+        
+        .code-snippet {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin-top: 15px;
+            overflow-x: auto;
+            line-height: 1.5;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .code-comment {
+            color: #7f8c8d;
+        }
+        
+        .code-tag {
+            color: #e74c3c;
+        }
+        
+        .code-attr {
+            color: #3498db;
+        }
+        
+        .code-value {
+            color: #2ecc71;
+        }
+        
+        .step-divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #3498db, transparent);
+            margin: 30px 0;
+        }
+        
+        .d3-highlight {
+            color: #f39c12;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .step-content {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .process-steps {
+                padding: 20px;
+            }
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            border-top: 1px solid #e1e8ed;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SVG2 制作过程详解</h1>
+            <p class="subtitle">优化路径图的完整创建流程</p>
+            </a>
+        </header>
+        
+        <div class="process-steps">
+            <!-- 步骤1 -->
+            <div class="step">
+                <h2 class="step-title">
+                    <span class="step-number">1</span>
+                    创建基础画布和网格系统
+                </h2>
+                <div class="step-content">
+                    <div class="step-image">
+                        <div style="background: #ecf0f1; padding: 40px; border-radius: 6px; text-align: center;">
+                            <svg width="200" height="200" viewBox="0 0 20 20" style="background: white; border: 1px solid #bdc3c7; border-radius: 4px;">
+                                <g transform="translate(1,1)">
+                                    <!-- 次网格 -->
+                                    <g stroke="#e9ecef" stroke-width="0.02">
+                                        <path d="M0 .5 H18 M0 1.0 H18 M0 1.5 H18 M0 2.0 H18 M0 2.5 H18
+                                               M0 3.0 H18 M0 3.5 H18 M0 4.0 H18 M0 4.5 H18 M0 5.0 H18
+                                               M0 5.5 H18 M0 6.0 H18 M0 6.5 H18 M0 7.0 H18 M0 7.5 H18
+                                               M0 8.0 H18 M0 8.5 H18 M0 9.0 H18 M0 9.5 H18 M0 10.0 H18"/>
+                                        <path d="M.5 0 V18 M1.0 0 V18 M1.5 0 V18 M2.0 0 V18 M2.5 0 V18
+                                               M3.0 0 V18 M3.5 0 V18 M4.0 0 V18 M4.5 0 V18 M5.0 0 V18"/>
+                                    </g>
+                                    <!-- 主网格 -->
+                                    <g stroke="#d7dde4" stroke-width="0.03">
+                                        <path d="M0 1 H18 M0 2 H18 M0 3 H18 M0 4 H18 M0 5 H18 M0 6 H18 M0 7 H18 M0 8 H18 M0 9 H18"/>
+                                        <path d="M1 0 V18 M2 0 V18 M3 0 V18 M4 0 V18 M5 0 V18 M6 0 V18 M7 0 V18 M8 0 V18 M9 0 V18"/>
+                                    </g>
+                                    <!-- 外框 -->
+                                    <rect x="0" y="0" width="18" height="18" fill="none" stroke="#222" stroke-width="0.06"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <p style="margin-top: 10px; color: #7f8c8d; font-size: 14px;">步骤1效果：基础画布与网格系统</p>
+                    </div>
+                    <div class="step-description">
+                        <p>创建一个20x20单位的SVG画布，并添加主网格和次网格系统，为路径规划提供参考坐标系。</p>
+                        
+                        <div class="key-points">
+                            <strong>关键点：</strong>
+                            <ul>
+                                <li>使用两层网格：主网格和次网格</li>
+                                <li>设置合适的stroke宽度和颜色</li>
+                                <li>使用transform调整位置</li>
+                                <li>为路径规划提供精确的坐标参考</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="code-snippet">
+<span class="code-tag">&lt;svg</span> <span class="code-attr">id</span>=<span class="code-value">"scene"</span> <span class="code-attr">xmlns</span>=<span class="code-value">"http://www.w3.org/2000/svg"</span>
+      <span class="code-attr">width</span>=<span class="code-value">"100%"</span> <span class="code-attr">height</span>=<span class="code-value">"100%"</span>
+      <span class="code-attr">viewBox</span>=<span class="code-value">"0 0 20 20"</span><span class="code-tag">&gt;</span>
+  
+  <span class="code-tag">&lt;defs&gt;</span>
+    <span class="code-comment">&lt;!-- 样式定义 --&gt;</span>
+    <span class="code-tag">&lt;style&gt;</span>
+      <span class="code-attr">.frame</span> { <span class="code-attr">stroke</span>: <span class="code-value">#222</span>; <span class="code-attr">stroke-width</span>: <span class="code-value">0.06</span>; <span class="code-attr">fill</span>: <span class="code-value">none</span>; }
+      <span class="code-attr">.gridMinor</span> { <span class="code-attr">stroke</span>: <span class="code-value">#e9ecef</span>; <span class="code-attr">stroke-width</span>: <span class="code-value">0.02</span>; }
+      <span class="code-attr">.gridMajor</span> { <span class="code-attr">stroke</span>: <span class="code-value">#d7dde4</span>; <span class="code-attr">stroke-width</span>: <span class="code-value">0.03</span>; }
+    <span class="code-tag">&lt;/style&gt;</span>
+  <span class="code-tag">&lt;/defs&gt;</span>
+
+  <span class="code-tag">&lt;g</span> <span class="code-attr">transform</span>=<span class="code-value">"translate(1,1)"</span><span class="code-tag">&gt;</span>
+    <span class="code-comment">&lt;!-- 网格系统 --&gt;</span>
+    <span class="code-tag">&lt;g</span> <span class="code-attr">class</span>=<span class="code-value">"gridMinor"</span><span class="code-tag">&gt;</span>
+      <span class="code-comment">&lt;!-- 水平次网格线 --&gt;</span>
+      <span class="code-tag">&lt;path</span> <span class="code-attr">d</span>=<span class="code-value">"M0 .5 H18 M0 1.0 H18 ..."</span><span class="code-tag">/&gt;</span>
+      <span class="code-comment">&lt;!-- 垂直次网格线 --&gt;</span>
+      <span class="code-tag">&lt;path</span> <span class="code-attr">d</span>=<span class="code-value">"M.5 0 V18 M1.0 0 V18 ..."</span><span class="code-tag">/&gt;</span>
+    <span class="code-tag">&lt;/g&gt;</span>
+    
+    <span class="code-tag">&lt;g</span> <span class="code-attr">class</span>=<span class="code-value">"gridMajor"</span><span class="code-tag">&gt;</span>
+      <span class="code-comment">&lt;!-- 水平主网格线 --&gt;</span>
+      <span class="code-tag">&lt;path</span> <span class="code-attr">d</span>=<span class="code-value">"M0 1 H18 M0 2 H18 ..."</span><span class="code-tag">/&gt;</span>
+      <span class="code-comment">&lt;!-- 垂直主网格线 --&gt;</span>
+      <span class="code-tag">&lt;path</span> <span class="code-attr">d</span>=<span class="code-value">"M1 0 V18 M2 0 V18 ..."</span><span class="code-tag">/&gt;</span>
+    <span class="code-tag">&lt;/g&gt;</span>
+    
+    <span class="code-comment">&lt;!-- 外框 --&gt;</span>
+    <span class="code-tag">&lt;rect</span> <span class="code-attr">class</span>=<span class="code-value">"frame"</span> <span class="code-attr">x</span>=<span class="code-value">"0"</span> <span class="code-attr">y</span>=<span class="code-value">"0"</span>
+          <span class="code-attr">width</span>=<span class="code-value">"18"</span> <span class="code-attr">height</span>=<span class="code-value">"18"</span><span class="code-tag">/&gt;</span>
+  <span class="code-tag">&lt;/g&gt;</span>
+<span class="code-tag">&lt;/svg&gt;</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step-divider"></div>
+            
+            <!-- 步骤2 -->
+            <div class="step">
+                <h2 class="step-title">
+                    <span class="step-number">2</span>
+                    绘制随机起点线段
+                </h2>
+                <div class="step-content">
+                    <div class="step-image">
+                        <div style="background: #ecf0f1; padding: 40px; border-radius: 6px; text-align: center;">
+                            <svg width="200" height="200" viewBox="0 0 20 20" style="background: white; border: 1px solid #bdc3c7; border-radius: 4px;">
+                                <g transform="translate(1,1)">
+                                    <!-- 简化网格 -->
+                                    <g stroke="#e9ecef" stroke-width="0.02">
+                                        <path d="M0 1 H18 M0 2 H18 M0 3 H18 M0 4 H18 M0 5 H18 M0 6 H18 M0 7 H18 M0 8 H18 M0 9 H18"/>
+                                        <path d="M1 0 V18 M2 0 V18 M3 0 V18 M4 0 V18 M5 0 V18 M6 0 V18 M7 0 V18 M8 0 V18 M9 0 V18"/>
+                                    </g>
+                                    <!-- 起点线段 -->
+                                    <line x1="5.78" y1="1.48" x2="6.02" y2="3.65" stroke="#111" stroke-width="0.1" marker-end="url(#arrow)"/>
+                                    <!-- 起点标签 -->
+                                    <text x="4.9" y="1.2" font-size="0.35" fill="#222" font-style="italic">random start</text>
+                                    <!-- 起点标记 -->
+                                    <rect x="5.48" y="1.18" width="0.6" height="0.6" rx="0.06" fill="#3b82f6" filter="url(#softShadow)"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <p style="margin-top: 10px; color: #7f8c8d; font-size: 14px;">步骤2效果：随机起点线段</p>
+                    </div>
+                    <div class="step-description">
+                        <p>绘制带有箭头的随机起点线段，并添加"random start"标签和起点标记(X)。</p>
+                        
+                        <div class="key-points">
+                            <strong>关键元素：</strong>
+                            <ul>
+                                <li>使用line元素绘制线段</li>
+                                <li>添加marker-end属性创建箭头</li>
+                                <li>使用text元素添加标签</li>
+                                <li>使用rect元素创建起点标记</li>
+                                <li>应用阴影滤镜增强视觉效果</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="code-snippet">
+<span class="code-comment">&lt;!-- 在defs中定义箭头和阴影 --&gt;</span>
+<span class="code-tag">&lt;defs&gt;</span>
+  <span class="code-tag">&lt;marker</span> <span class="code-attr">id</span>=<span class="code-value">"arrow"</span>
+          <span class="code-attr">viewBox</span>=<span class="code-value">"0 0 10 10"</span>
+          <span class="code-attr">refX</span>=<span class="code-value">"9"</span> <span class="code-attr">refY</span>=<span class="code-value">"5"</span>
+          <span class="code-attr">markerWidth</span>=<span class="code-value">"3.2"</span> <span class="code-attr">markerHeight</span>=<span class="code-value">"3.2"</span>
+          <span class="code-attr">orient</span>=<span class="code-value">"auto"</span><span class="code-tag">&gt;</span>
+    <span class="code-tag">&lt;path</span> <span class="code-attr">d</span>=<span class="code-value">"M0 0 L10 5 L0 10 Z"</span> <span class="code-attr">fill</span>=<span class="code-value">"#111"</span><span class="code-tag">/&gt;</span>
+  <span class="code-tag">&lt;/marker&gt;</span>
+  
+  <span class="code-tag">&lt;filter</span> <span class="code-attr">id</span>=<span class="code-value">"softShadow"</span>
+          <span class="code-attr">x</span>=<span class="code-value">"-50%"</span> <span class="code-attr">y</span>=<span class="code-value">"-50%"</span>
+          <span class="code-attr">width</span>=<span class="code-value">"200%"</span> <span class="code-attr">height</span>=<span class="code-value">"200%"</span><span class="code-tag">&gt;</span>
+    <span class="code-tag">&lt;feDropShadow</span> <span class="code-attr">dx</span>=<span class="code-value">"0.08"</span> <span class="code-attr">dy</span>=<span class="code-value">"0.08"</span>
+                   <span class="code-attr">stdDeviation</span>=<span class="code-value">"0.12"</span>
+                   <span class="code-attr">flood-color</span>=<span class="code-value">"#000"</span>
+                   <span class="code-attr">flood-opacity</span>=<span class="code-value">"0.25"</span><span class="code-tag">/&gt;</span>
+  <span class="code-tag">&lt;/filter&gt;</span>
+<span class="code-tag">&lt;/defs&gt;</span>
+
+<span class="code-comment">&lt;!-- 起始线段与标签 --&gt;</span>
+<span class="code-tag">&lt;line</span> <span class="code-attr">id</span>=<span class="code-value">"startSeg"</span> <span class="code-attr">class</span>=<span class="code-value">"start"</span>
+      <span class="code-attr">x1</span>=<span class="code-value">"5.78"</span> <span class="code-attr">y1</span>=<span class="code-value">"1.48"</span>
+      <span class="code-attr">x2</span>=<span class="code-value">"6.02"</span> <span class="code-attr">y2</span>=<span class="code-value">"3.65"</span>
+      <span class="code-attr">stroke</span>=<span class="code-value">"#111"</span> <span class="code-attr">stroke-width</span>=<span class="code-value">"0.1"</span>
+      <span class="code-attr">marker-end</span>=<span class="code-value">"url(#arrow)"</span><span class="code-tag">/&gt;</span>
+
+<span class="code-tag">&lt;text</span> <span class="code-attr">class</span>=<span class="code-value">"label"</span> <span class="code-attr">x</span>=<span class="code-value">"4.9"</span> <span class="code-attr">y</span>=<span class="code-value">"1.2"</span>
+      <span class="code-attr">font-style</span>=<span class="code-value">"italic"</span><span class="code-tag">&gt;</span>random start<span class="code-tag">&lt;/text&gt;</span>
+
+<span class="code-comment">&lt;!-- 起点色块 --&gt;</span>
+<span class="code-tag">&lt;rect</span> <span class="code-attr">x</span>=<span class="code-value">"5.48"</span> <span class="code-attr">y</span>=<span class="code-value">"1.18"</span> <span class="code-attr">width</span>=<span class="code-value">"0.6"</span>
+      <span class="code-attr">height</span>=<span class="code-value">"0.6"</span> <span class="code-attr">rx</span>=<span class="code-value">"0.06"</span>
+      <span class="code-attr">fill</span>=<span class="code-value">"#3b82f6"</span>
+      <span class="code-attr">filter</span>=<span class="code-value">"url(#softShadow)"</span><span class="code-tag">/&gt;</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step-divider"></div>
+            
+            <!-- 步骤3 -->
+            <div class="step">
+                <h2 class="step-title">
+                    <span class="step-number">3</span>
+                    规划路径并生成箭头线段
+                </h2>
+                <div class="step-content">
+                    <div class="step-image">
+                        <div style="background: #ecf0f1; padding: 40px; border-radius: 6px; text-align: center;">
+                            <svg width="200" height="200" viewBox="0 0 20 20" style="background: white; border: 1px solid #bdc3c7; border-radius: 4px;">
+                                <g transform="translate(1,1)">
+                                    <!-- 简化网格 -->
+                                    <g stroke="#e9ecef" stroke-width="0.02">
+                                        <path d="M0 1 H18 M0 2 H18 M0 3 H18 M0 4 H18 M0 5 H18 M0 6 H18 M0 7 H18 M0 8 H18 M0 9 H18"/>
+                                        <path d="M1 0 V18 M2 0 V18 M3 0 V18 M4 0 V18 M5 0 V18 M6 0 V18 M7 0 V18 M8 0 V18 M9 0 V18"/>
+                                    </g>
+                                    <!-- 路径线段 -->
+                                    <line x1="6.00" y1="4.20" x2="5.60" y2="5.80" stroke="#111" stroke-width="0.08" stroke-dasharray="0.6 0.35" marker-end="url(#arrow)"/>
+                                    <line x1="5.60" y1="5.80" x2="5.10" y2="7.40" stroke="#111" stroke-width="0.08" stroke-dasharray="0.6 0.35" marker-end="url(#arrow)"/>
+                                    <line x1="5.10" y1="7.40" x2="4.40" y2="8.80" stroke="#111" stroke-width="0.08" stroke-dasharray="0.6 0.35" marker-end="url(#arrow)"/>
+                                    <!-- 更多线段... -->
+                                    <!-- 起点和终点 -->
+                                    <rect x="5.48" y="1.18" width="0.6" height="0.6" rx="0.06" fill="#3b82f6" filter="url(#softShadow)"/>
+                                    <rect x="11.98" y="8.68" width="0.6" height="0.6" rx="0.06" fill="#ef4444" filter="url(#softShadow)"/>
+                                </g>
+                            </svg>
+                        </div>
+                        <p style="margin-top: 10px; color: #7f8c8d; font-size: 14px;">步骤3效果：路径规划与箭头线段</p>
+                    </div>
+                    <div class="step-description">
+                        <p>基于初始箭头线段规划完整路径，使用D3.js生成约15个小箭头线段，形成优化路径。</p>
+                        
+                        <div class="key-points">
+                            <strong>技术实现：</strong>
+                            <ul>
+                                <li>使用D3.js进行路径数据处理</li>
+                                <li>定义基准折线路径点</li>
+                                <li>将路径拆分为多个短线段</li>
+                                <li>为每个线段添加箭头和虚线动画</li>
+                                <li>使用stroke-dasharray创建流动效果</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="code-snippet">
+<span class="code-comment">&lt;!-- 基准折线路径 --&gt;</span>
+<span class="code-tag">&lt;polyline</span> <span class="code-attr">id</span>=<span class="code-value">"routeBase"</span> <span class="code-attr">points</span>=<span class="code-value">"
+  6.00,4.20 5.60,5.80 5.10,7.40 4.40,8.80 4.10,9.60
+  4.70,10.20 5.40,10.60 4.40,11.00 4.20,10.00 4.90,9.40
+  6.00,10.00 7.00,10.00 8.60,9.60 9.80,9.00 11.00,9.00
+  12.00,9.30 13.50,8.60 14.20,8.00 12.60,8.00
+"</span> <span class="code-attr">fill</span>=<span class="code-value">"none"</span> <span class="code-attr">stroke</span>=<span class="code-value">"none"</span><span class="code-tag">/&gt;</span>
+
+<span class="code-comment">&lt;!-- D3.js 路径处理 --&gt;</span>
+<span class="code-tag">&lt;script&gt;</span>
+<span class="code-attr">const</span> <span class="code-value">svg</span> = <span class="code-attr">d3</span>.<span class="code-value">select</span>(<span class="code-value">'#scene'</span>);
+<span class="code-attr">const</span> <span class="code-value">basePts</span> = <span class="code-attr">d3</span>.<span class="code-value">select</span>(<span class="code-value">'#routeBase'</span>)
+  .<span class="code-value">attr</span>(<span class="code-value">'points'</span>)
+  .<span class="code-value">trim</span>()
+  .<span class="code-value">split</span>(<span class="code-value">/\s+/</span>)
+  .<span class="code-value">map</span>(<span class="code-value">s</span> => {
+    <span class="code-attr">const</span> [<span class="code-value">x</span>, <span class="code-value">y</span>] = <span class="code-value">s</span>.<span class="code-value">split</span>(<span class="code-value">','</span>).<span class="code-value">map</span>(<span class="code-value">Number</span>);
+    <span class="code-attr">return</span> { <span class="code-value">x</span>, <span class="code-value">y</span> };
+  });
+
+<span class="code-comment">// 生成路径线段</span>
+<span class="code-attr">const</span> <span class="code-value">segLayer</span> = <span class="code-attr">d3</span>.<span class="code-value">select</span>(<span class="code-value">'#routeSegments'</span>);
+<span class="code-attr">const</span> <span class="code-value">trim</span> = <span class="code-value">0.14</span>;
+
+<span class="code-attr">function</span> <span class="code-value">addSeg</span>(<span class="code-value">a</span>, <span class="code-value">b</span>) {
+  <span class="code-attr">const</span> <span class="code-value">dx</span> = <span class="code-value">b.x - a.x</span>, <span class="code-value">dy</span> = <span class="code-value">b.y - a.y</span>;
+  <span class="code-attr">const</span> <span class="code-value">L</span> = <span class="code-attr">Math</span>.<span class="code-value">hypot</span>(<span class="code-value">dx</span>, <span class="code-value">dy</span>);
+  <span class="code-attr">if</span> (<span class="code-value">L</span> <= <span class="code-value">2 * trim</span>) <span class="code-attr">return</span>;
+  
+  <span class="code-attr">const</span> <span class="code-value">ux</span> = <span class="code-value">dx / L</span>, <span class="code-value">uy</span> = <span class="code-value">dy / L</span>;
+  
+  <span class="code-value">segLayer</span>.<span class="code-value">append</span>(<span class="code-value">'line'</span>)
+    .<span class="code-value">attr</span>(<span class="code-value">'class'</span>, <span class="code-value">'seg'</span>)
+    .<span class="code-value">attr</span>(<span class="code-value">'x1'</span>, <span class="code-value">a.x + ux * trim</span>)
+    .<span class="code-value">attr</span>(<span class="code-value">'y1'</span>, <span class="code-value">a.y + uy * trim</span>)
+    .<span class="code-value">attr</span>(<span class="code-value">'x2'</span>, <span class="code-value">b.x - ux * trim</span>)
+    .<span class="code-value">attr</span>(<span class="code-value">'y2'</span>, <span class="code-value">b.y - uy * trim</span>);
+}
+
+<span class="code-comment">// 为每对相邻点创建线段</span>
+<span class="code-attr">for</span> (<span class="code-attr">let</span> <span class="code-value">i</span> = <span class="code-value">0</span>; <span class="code-value">i</span> < <span class="code-value">basePts.length - 1</span>; <span class="code-value">i</span>++) {
+  <span class="code-value">addSeg</span>(<span class="code-value">basePts[i]</span>, <span class="code-value">basePts[i + 1]</span>);
+}
+<span class="code-tag">&lt;/script&gt;</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step-divider"></div>
+            
+            <!-- 步骤4 -->
+            <div class="step">
+                <h2 class="step-title">
+                    <span class="step-number">4</span>
+                    标记覆盖区域和运动动画
+                </h2>
+                <div class="step-content">
+                    <div class="step-image">
+                        <div style="background: #ecf0f1; padding: 40px; border-radius: 6px; text-align: center;">
+                            <svg width="200" height="200" viewBox="0 0 20 20" style="background: white; border: 1px solid #bdc3c7; border-radius: 4px;">
+                                <g transform="translate(1,1)">
+                                    <!-- 简化网格 -->
+                                    <g stroke="#e9ecef" stroke-width="0.02">
+                                        <path d="M0 1 H18 M0 2 H18 M0 3 H18 M0 4 H18 M0 5 H18 M0 6 H18 M0 7 H18 M0 8 H18 M0 9 H18"/>
+                                        <path d="M1 0 V18 M2 0 V18 M3 0 V18 M4 0 V18 M5 0 V18 M6 0 V18 M7 0 V18 M8 0 V18 M9 0 V18"/>
+                                    </g>
+                                    <!-- 覆盖区域 -->
+                                    <path d="M6,4.2 L5.6,5.8 L5.1,7.4 L4.4,8.8 L4.1,9.6 L4.7,10.2 L5.4,10.6 L4.4,11 L4.2,10 L4.9,9.4 L6,10 L7,10 L8.6,9.6 L9.8,9 L11,9 L12,9.3 L13.5,8.6 L14.2,8 L12.6,8 Z" 
+                                          fill="#7fc1ff" fill-opacity="0.22" stroke="#7fb0e0" stroke-width="0.05" filter="url(#softShadow)"/>
+                                    <!-- 运动色块 -->
+                                    <rect x="11.48" y="8.68" width="0.7" height="0.7" rx="0.08" fill="#ef4444" filter="url(#softShadow)"/>
+                                    <!-- 文本提示 -->
+                                    <text x="11.6" y="12.8" font-size="0.48" fill="#1f6feb">covered space</text>
+                                    <text x="11.6" y="13.5" font-size="0.48" fill="#6b7280">no coverage</text>
+                                </g>
+                            </svg>
+                        </div>
+                        <p style="margin-top: 10px; color: #7f8c8d; font-size: 14px;">步骤4效果：覆盖区域与运动动画</p>
+                    </div>
+                    <div class="step-description">
+                        <p>使用浅蓝色透明区域标记路径覆盖范围，添加运动色块动画，并标注覆盖空间和无覆盖区域。</p>
+                        
+                        <div class="key-points">
+                            <strong>实现细节：</strong>
+                            <ul>
+                                <li>使用路径偏移算法生成覆盖区域</li>
+                                <li>应用脉动动画增强视觉效果</li>
+                                <li>使用D3.js创建色块运动动画</li>
+                                <li>标注覆盖空间和无覆盖区域</li>
+                                <li>使用CSS动画创建流动效果</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="code-snippet">
+<span class="code-comment">&lt;!-- 覆盖带样式定义 --&gt;</span>
+<span class="code-tag">&lt;style&gt;</span>
+<span class="code-attr">.band</span> {
+  <span class="code-attr">fill</span>: <span class="code-value">#7fc1ff</span>;
+  <span class="code-attr">fill-opacity</span>: <span class="code-value">.22</span>;
+  <span class="code-attr">stroke</span>: <span class="code-value">#7fb0e0</span>;
+  <span class="code-attr">stroke-width</span>: <span class="code-value">0.05</span>;
+  <span class="code-attr">filter</span>: <span class="code-value">url(#softShadow)</span>;
+  <span class="code-attr">animation</span>: <span class="code-value">bandPulse 3.5s ease-in-out infinite</span>;
+}
+
+<span class="code-attr">@keyframes</span> <span class="code-value">bandPulse</span> {
+  <span class="code-value">0%</span>, <span class="code-value">100%</span> { <span class="code-attr">fill-opacity</span>: <span class="code-value">.18</span>; }
+  <span class="code-value">50%</span> { <span class="code-attr">fill-opacity</span>: <span class="code-value">.30</span>; }
+}
+
+<span class="code-attr">.seg</span> {
+  <span class="code-attr">fill</span>: <span class="code-value">none</span>;
+  <span class="code-attr">stroke</span>: <span class="code-value">#111</span>;
+  <span class="code-attr">stroke-width</span>: <span class="code-value">0.08</span>;
+  <span class="code-attr">stroke-linecap</span>: <span class="code-value">round</span>;
+  <span class="code-attr">stroke-linejoin</span>: <span class="code-value">round</span>;
+  <span class="code-attr">marker-end</span>: <span class="code-value">url(#arrow)</span>;
+  <span class="code-attr">stroke-dasharray</span>: <span class="code-value">0.6 0.35</span>;
+  <span class="code-attr">animation</span>: <span class="code-value">flow 1.2s linear infinite</span>;
+}
+
+<span class="code-attr">@keyframes</span> <span class="code-value">flow</span> {
+  <span class="code-attr">to</span> { <span class="code-attr">stroke-dashoffset</span>: <span class="code-value">-1.0</span>; }
+}
+<span class="code-tag">&lt;/style&gt;</span>
+
+<span class="code-comment">&lt;!-- D3.js 覆盖区域生成 --&gt;</span>
+<span class="code-tag">&lt;script&gt;</span>
+<span class="code-comment">// 生成覆盖区域路径</span>
+<span class="code-attr">function</span> <span class="code-value">norm</span>(<span class="code-value">v</span>) {
+  <span class="code-attr">const</span> <span class="code-value">L</span> = <span class="code-attr">Math</span>.<span class="code-value">hypot</span>(<span class="code-value">v.x</span>, <span class="code-value">v.y</span>);
+  <span class="code-attr">return</span> <span class="code-value">L</span> < <span class="code-value">1e-6</span> ? { <span class="code-value">x</span>: <span class="code-value">0</span>, <span class="code-value">y</span>: <span class="code-value">0</span> } : { <span class="code-value">x</span>: <span class="code-value">v.x / L</span>, <span class="code-value">y</span>: <span class="code-value">v.y / L</span> };
+}
+
+<span class="code-attr">function</span> <span class="code-value">leftN</span>(<span class="code-value">u</span>) {
+  <span class="code-attr">return</span> { <span class="code-value">x</span>: <span class="code-value">-u.y</span>, <span class="code-value">y</span>: <span class="code-value">u.x</span> };
+}
+
+<span class="code-comment">// 计算覆盖区域边界点</span>
+<span class="code-attr">const</span> <span class="code-value">left</span> = [], <span class="code-value">right</span> = [];
+<span class="code-attr">const</span> <span class="code-value">bandW</span> = <span class="code-value">0.20</span>;
+
+<span class="code-comment">// 生成覆盖区域多边形</span>
+<span class="code-attr">const</span> <span class="code-value">hull</span> = [...<span class="code-value">left</span>, ...<span class="code-value">right</span>.<span class="code-value">reverse</span>()];
+<span class="code-attr">d3</span>.<span class="code-value">select</span>(<span class="code-value">'#bandLayer'</span>)
+  .<span class="code-value">append</span>(<span class="code-value">'path'</span>)
+  .<span class="code-value">attr</span>(<span class="code-value">'class'</span>, <span class="code-value">'band'</span>)
+  .<span class="code-value">attr</span>(<span class="code-value">'d'</span>, <span class="code-value">'M'</span> + <span class="code-value">hull</span>.<span class="code-value">map</span>(<span class="code-value">p</span> => `<span class="code-value">${p.x},${p.y}</span>`).<span class="code-value">join</span>(<span class="code-value">' L '</span>) + <span class="code-value">' Z'</span>);
+
+<span class="code-comment">// 运动动画</span>
+<span class="code-attr">function</span> <span class="code-value">move</span>(<span class="code-value">sel</span>, <span class="code-value">duration</span>, <span class="code-value">delay</span>) {
+  <span class="code-value">sel</span>.<span class="code-value">attr</span>(<span class="code-value">'width'</span>, <span class="code-value">0.7</span>).<span class="code-value">attr</span>(<span class="code-value">'height'</span>, <span class="code-value">0.7</span>).<span class="code-value">attr</span>(<span class="code-value">'rx'</span>, <span class="code-value">0.08</span>);
+  
+  <span class="code-attr">function</span> <span class="code-value">run</span>() {
+    <span class="code-value">sel</span>.<span class="code-value">transition</span>()
+      .<span class="code-value">duration</span>(<span class="code-value">duration</span>)
+      .<span class="code-value">delay</span>(<span class="code-value">delay</span>)
+      .<span class="code-value">ease</span>(<span class="code-attr">d3</span>.<span class="code-value">easeCubicInOut</span>)
+      .<span class="code-value">attrTween</span>(<span class="code-value">'transform'</span>, <span class="code-value">function</span>() {
+        <span class="code-attr">return</span> <span class="code-value">function</span>(<span class="code-value">t</span>) {
+          <span class="code-attr">const</span> <span class="code-value">p</span> = <span class="code-value">pathNode</span>.<span class="code-value">getPointAtLength</span>(<span class="code-value">t * total</span>);
+          <span class="code-attr">return</span> `<span class="code-value">translate(${p.x-0.35},${p.y-0.35})</span>`;
+        };
+      })
+      .<span class="code-value">on</span>(<span class="code-value">'end'</span>, <span class="code-value">run</span>);
+  }
+  <span class="code-value">run</span>();
+}
+
+<span class="code-comment">// 启动红色块运动动画</span>
+<span class="code-value">move</span>(<span class="code-attr">d3</span>.<span class="code-value">select</span>(<span class="code-value">'#blockRed'</span>), <span class="code-value">4200</span>, <span class="code-value">600</span>);
+<span class="code-tag">&lt;/script&gt;</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+</body>
+</html>

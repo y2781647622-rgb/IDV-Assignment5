@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG1 制作过程 - Assignment3</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-5px);
+        }
+        
+        .process-steps {
+            padding: 40px;
+        }
+        
+        .step {
+            margin-bottom: 50px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+            transition: transform 0.3s ease;
+        }
+        
+        .step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            margin-right: 12px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);
+        }
+        
+        .step-title {
+            font-size: 1.4rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        
+        .step-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .step-image {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .step-image img {
+            max-width: 100%;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        
+        .step-description {
+            padding: 10px 0;
+        }
+        
+        .step-description p {
+            margin-bottom: 15px;
+            color: #555;
+        }
+        
+        .key-points {
+            background: #e8f4fc;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border-left: 3px solid #3498db;
+        }
+        
+        .key-points strong {
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .key-points ul {
+            padding-left: 20px;
+            margin: 0;
+        }
+        
+        .key-points li {
+            margin-bottom: 5px;
+        }
+        
+        .code-snippet {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin-top: 15px;
+            overflow-x: auto;
+            line-height: 1.5;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .code-comment {
+            color: #7f8c8d;
+        }
+        
+        .code-tag {
+            color: #e74c3c;
+        }
+        
+        .code-attr {
+            color: #3498db;
+        }
+        
+        .code-value {
+            color: #2ecc71;
+        }
+        
+        .step-divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #3498db, transparent);
+            margin: 30px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .step-content {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .process-steps {
+                padding: 20px;
+            }
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            border-top: 1px solid #e1e8ed;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SVG1 制作过程详解</h1>
+            <p class="subtitle">几何图形动画的完整创建流程</p>
+            </a>
+        </header>
+        
+        <div class="process-steps">
+            <!-- 步骤1 -->
+            <div class="step">
+                <h2 class="step-title">
+                    <span class="step-number">1</span>
+                    创建基础画布
+                </h2>
+                <div class="step-content">
+                    <div class="step-image">
+                        <div style="background: #ecf0f1; padding: 40px; border-radius: 6px; text-align: center;">
+                            <div style="width: 200px; height: 200px; margin: 0 auto; border: 2px dashed #bdc3c7; background: white; display: flex; align-items: center; justify-content: center; color: #7f8c8d; font-weight: bold;">
+                                10x10 画布
+                            </div>
+                        </div>
+                        <p style="margin-top: 10px; color: #7f8c8d; font-size: 14px;">步骤1效果：基础画布框架</p>
+                    </div>
+                    <div class="step-description">
+                        <p>首先创建一个10x10单位的SVG画布，设置合适的viewBox和尺寸。这一步为整个图形提供了绘制空间。</p>
+                        
+                        <div class="key-points">
+                            <strong>关键点：</strong>
+                            <ul>
+                                <li>确定合适的坐标系和比例</li>
+                                <li>设置viewBox为0 0 10 10</li>
+                                <li>为后续图形定位打下基础</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="code-snippet">
+<span class="code-tag">&lt;svg</span> <span class="code-attr">xmlns</span>=<span class="code-value">"http://www.w3.org/2000/svg"</span>
+      <span class="code-attr">width</span>=<span class="code-value">"100%"</span> <span class="code-attr">height</span>=<span class="code-value">"100%"</span>
+      <span class="code-attr">viewBox</span>=<span class="code-value">"0 0 10 10"</span><span class="code-tag">&gt;</span>
+  
+  <span class="code-comment">&lt;!-- 白色背景 --&gt;</span>
+  <span class="code-tag">&lt;rect</span> <span class="code-attr">x</span>=<span class="code-value">"0"</span> <span class="code-attr">y</span>=<span class="code-value">"0"</span>
+        <span class="code-attr">width</span>=<span class="code-value">"10"</span> <span class="code-attr">height</span>=<span class="code-value">"10"</span>
+        <span class="code-attr">fill</span>=<span class="code-value">"white"</span><span class="code-tag">/&gt;</span>
+        
+<span class="code-tag">&lt;/svg&gt;</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step-divider"></div>
+            
+            <!-- 步骤2 -->
+            <div class="step">
+                <h2 class="step-title">
+                    <span class="step-number">2</span>
+                    绘制平行四边形
+                </h2>
+                <div class="step-content">
+                    <div class="step-image">
+                        <div style="background: #ecf0f1; padding: 40px; border-radius: 6px; text-align: center;">
+                            <svg width="200" height="200" viewBox="0 0 10 10" style="background: white; border: 1px solid #bdc3c7; border-radius: 4px;">
+                                <rect x="0" y="0" width="10" height="10" fill="white"/>
+                                <polyline points="1,1 1,4 3,6 3,3 1,1" fill="none" stroke="#3498db" stroke-width="0.08" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="1" cy="1" r="0.1" fill="#e74c3c"/>
+                                <circle cx="1" cy="4" r="0.1" fill="#2ecc71"/>
+                                <circle cx="3" cy="6" r="0.1" fill="#f39c12"/>
+                                <circle cx="3" cy="3" r="0.1" fill="#9b59b6"/>
+                                <text x="0.5" y="1" font-size="0.3" fill="#2c3e50">A</text>
+                                <text x="0.5" y="4" font-size="0.3" fill="#2c3e50">B</text>
+                                <text x="3.2" y="6" font-size="0.3" fill="#2c3e50">C</text>
+                                <text x="3.2" y="3" font-size="0.3" fill="#2c3e50">D</text>
+                            </svg>
+                        </div>
+                        <p style="margin-top: 10px; color: #7f8c8d; font-size: 14px;">步骤2效果：平行四边形轮廓</p>
+                    </div>
+                    <div class="step-description">
+                        <p>使用polyline元素绘制平行四边形，设置四个关键点的坐标，并添加标签标识各个顶点。</p>
+                        
+                        <div class="key-points">
+                            <strong>坐标说明：</strong>
+                            <ul>
+                                <li>A(1,1) - 红色点</li>
+                                <li>B(1,4) - 绿色点</li>
+                                <li>C(3,6) - 橙色点</li>
+                                <li>D(3,3) - 紫色点</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="code-snippet">
+<span class="code-comment">&lt;!-- 主多边形 --&gt;</span>
+<span class="code-tag">&lt;polyline</span> <span class="code-attr">id</span>=<span class="code-value">"abcd"</span>
+          <span class="code-attr">points</span>=<span class="code-value">"1,1 1,4 3,6 3,3 1,1"</span>
+          <span class="code-attr">fill</span>=<span class="code-value">"none"</span> <span class="code-attr">stroke</span>=<span class="code-value">"#000"</span>
+          <span class="code-attr">stroke-width</span>=<span class="code-value">"0.08"</span>
+          <span class="code-attr">stroke-linecap</span>=<span class="code-value">"round"</span>
+          <span class="code-attr">stroke-linejoin</span>=<span class="code-value">"round"</span><span class="code-tag">/&gt;</span>
+
+<span class="code-comment">&lt;!-- 标签 --&gt;</span>
+<span class="code-tag">&lt;g</span> <span class="code-attr">font-size</span>=<span class="code-value">"0.35"</span> <span class="code-attr">fill</span>=<span class="code-value">"#000"</span>
+     <span class="code-attr">text-anchor</span>=<span class="code-value">"start"</span>
+     <span class="code-attr">dominant-baseline</span>=<span class="code-value">"middle"</span><span class="code-tag">&gt;</span>
+  <span class="code-tag">&lt;text</span> <span class="code-attr">x</span>=<span class="code-value">"0.5"</span> <span class="code-attr">y</span>=<span class="code-value">"1"</span><span class="code-tag">&gt;</span>A<span class="code-tag">&lt;/text&gt;</span>
+  <span class="code-tag">&lt;text</span> <span class="code-attr">x</span>=<span class="code-value">"0.5"</span> <span class="code-attr">y</span>=<span class="code-value">"4"</span><span class="code-tag">&gt;</span>B<span class="code-tag">&lt;/text&gt;</span>
+  <span class="code-tag">&lt;text</span> <span class="code-attr">x</span>=<span class="code-value">"3.2"</span> <span class="code-attr">y</span>=<span class="code-value">"3"</span><span class="code-tag">&gt;</span>D<span class="code-tag">&lt;/text&gt;</span>
+  <span class="code-tag">&lt;text</span> <span class="code-attr">x</span>=<span class="code-value">"3.2"</span> <span class="code-attr">y</span>=<span class="code-value">"6"</span><span class="code-tag">&gt;</span>C<span class="code-tag">&lt;/text&gt;</span>
+<span class="code-tag">&lt;/g&gt;</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step-divider"></div>
+            
+            <!-- 步骤3 -->
+            <div class="step">
+                <h2 class="step-title">
+                    <span class="step-number">3</span>
+                    连接对角线并添加箭头
+                </h2>
+                <div class="step-content">
+                    <div class="step-image">
+                        <div style="background: #ecf0f1; padding: 40px; border-radius: 6px; text-align: center;">
+                            <svg width="200" height="200" viewBox="0 0 10 10" style="background: white; border: 1px solid #bdc3c7; border-radius: 4px;">
+                                <rect x="0" y="0" width="10" height="10" fill="white"/>
+                                <polyline points="1,1 1,4 3,6 3,3 1,1" fill="none" stroke="#2c3e50" stroke-width="0.08" stroke-linecap="round" stroke-linejoin="round"/>
+                                <line x1="3" y1="6" x2="1" y2="1" stroke="#3498db" stroke-width="0.08" stroke-dasharray="0.2 0.2"/>
+                                <line x1="3" y1="3" x2="1" y2="4" stroke="#2c3e50" stroke-width="0.08" stroke-dasharray="0.2 0.2"/>
+                                <polygon points="1,1 0.7,0.7 1.3,0.7" fill="#3498db"/>
+                                <polygon points="1,4 0.7,4.3 1.3,4.3" fill="#2c3e50"/>
+                                <circle cx="1" cy="1" r="0.1" fill="#e74c3c"/>
+                                <circle cx="1" cy="4" r="0.1" fill="#2ecc71"/>
+                                <circle cx="3" cy="6" r="0.1" fill="#f39c12"/>
+                                <circle cx="3" cy="3" r="0.1" fill="#9b59b6"/>
+                                <text x="0.5" y="1" font-size="0.3" fill="#2c3e50">A</text>
+                                <text x="0.5" y="4" font-size="0.3" fill="#2c3e50">B</text>
+                                <text x="3.2" y="6" font-size="0.3" fill="#2c3e50">C</text>
+                                <text x="3.2" y="3" font-size="0.3" fill="#2c3e50">D</text>
+                            </svg>
+                        </div>
+                        <p style="margin-top: 10px; color: #7f8c8d; font-size: 14px;">步骤3效果：添加对角线</p>
+                    </div>
+                    <div class="step-description">
+                        <p>绘制两条对角线并添加箭头指示方向，使用marker元素定义箭头样式，并设置虚线效果。</p>
+                        
+                        <div class="key-points">
+                            <strong>对角线说明：</strong>
+                            <ul>
+                                <li>DA线：从D(3,3)到A(1,1)，蓝色虚线箭头</li>
+                                <li>CB线：从C(3,6)到B(1,4)，黑色虚线箭头</li>
+                                <li>使用marker-end属性添加箭头</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="code-snippet">
+<span class="code-comment">&lt;!-- 定义箭头标记 --&gt;</span>
+<span class="code-tag">&lt;defs&gt;</span>
+  <span class="code-tag">&lt;marker</span> <span class="code-attr">id</span>=<span class="code-value">"arrow-blue"</span>
+          <span class="code-attr">viewBox</span>=<span class="code-value">"0 0 10 10"</span>
+          <span class="code-attr">refX</span>=<span class="code-value">"10"</span> <span class="code-attr">refY</span>=<span class="code-value">"5"</span>
+          <span class="code-attr">markerWidth</span>=<span class="code-value">"4"</span> <span class="code-attr">markerHeight</span>=<span class="code-value">"4"</span>
+          <span class="code-attr">orient</span>=<span class="code-value">"auto"</span><span class="code-tag">&gt;</span>
+    <span class="code-tag">&lt;path</span> <span class="code-attr">d</span>=<span class="code-value">"M0 0 L10 5 L0 10 Z"</span>
+          <span class="code-attr">fill</span>=<span class="code-value">"#1976d2"</span><span class="code-tag">/&gt;</span>
+  <span class="code-tag">&lt;/marker&gt;</span>
+<span class="code-tag">&lt;/defs&gt;</span>
+
+<span class="code-comment">&lt;!-- 连接线 --&gt;</span>
+<span class="code-tag">&lt;line</span> <span class="code-attr">id</span>=<span class="code-value">"DA"</span> <span class="code-attr">class</span>=<span class="code-value">"line-animation"</span>
+      <span class="code-attr">x1</span>=<span class="code-value">"3"</span> <span class="code-attr">y1</span>=<span class="code-value">"6"</span> <span class="code-attr">x2</span>=<span class="code-value">"1"</span> <span class="code-attr">y2</span>=<span class="code-value">"1"</span>
+      <span class="code-attr">stroke</span>=<span class="code-value">"#1976d2"</span> <span class="code-attr">stroke-width</span>=<span class="code-value">"0.08"</span>
+      <span class="code-attr">stroke-dasharray</span>=<span class="code-value">"0.2 0.2"</span>
+      <span class="code-attr">marker-end</span>=<span class="code-value">"url(#arrow-blue)"</span><span class="code-tag">/&gt;</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="step-divider"></div>
+            
+            <!-- 步骤4 -->
+            <div class="step">
+                <h2 class="step-title">
+                    <span class="step-number">4</span>
+                    添加动画和交互效果
+                </h2>
+                <div class="step-content">
+                    <div class="step-image">
+                        <div style="background: #ecf0f1; padding: 40px; border-radius: 6px; text-align: center;">
+                            <svg width="200" height="200" viewBox="0 0 10 10" style="background: white; border: 1px solid #bdc3c7; border-radius: 4px;">
+                                <rect x="0" y="0" width="10" height="10" fill="white"/>
+                                <polyline points="1,1 1,4 3,6 3,3 1,1" fill="none" stroke="#2c3e50" stroke-width="0.08" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0.5"/>
+                                <line x1="3" y1="6" x2="1" y2="1" stroke="#3498db" stroke-width="0.08" stroke-dasharray="0.2 0.2"/>
+                                <line x1="3" y1="3" x2="1" y2="4" stroke="#2c3e50" stroke-width="0.08" stroke-dasharray="0.2 0.2"/>
+                                <circle cx="1" cy="1" r="0.15" fill="#e74c3c"/>
+                                <circle cx="1" cy="4" r="0.15" fill="#2ecc71"/>
+                                <circle cx="3" cy="6" r="0.15" fill="#f39c12"/>
+                                <circle cx="3" cy="3" r="0.15" fill="#9b59b6"/>
+                                <text x="0.5" y="1" font-size="0.3" fill="#2c3e50" opacity="0.7">A</text>
+                                <text x="0.5" y="4" font-size="0.3" fill="#2c3e50" opacity="0.7">B</text>
+                                <text x="3.2" y="6" font-size="0.3" fill="#2c3e50" opacity="0.7">C</text>
+                                <text x="3.2" y="3" font-size="0.3" fill="#2c3e50" opacity="0.7">D</text>
+                            </svg>
+                        </div>
+                        <p style="margin-top: 10px; color: #7f8c8d; font-size: 14px;">步骤4效果：动画和交互</p>
+                    </div>
+                    <div class="step-description">
+                        <p>使用CSS和JavaScript添加动画效果和交互功能，包括虚线流动动画、标签闪烁效果和点击交互。</p>
+                        
+                        <div class="key-points">
+                            <strong>动画效果：</strong>
+                            <ul>
+                                <li>主多边形虚线流动动画</li>
+                                <li>标签闪烁效果</li>
+                                <li>对角线虚线流动</li>
+                                <li>点击点高亮相关线条</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="code-snippet">
+<span class="code-comment">&lt;!-- CSS动画 --&gt;</span>
+<span class="code-tag">&lt;style&gt;</span>
+<span class="code-attr">#svg1</span> <span class="code-attr">.line-animation</span> {
+  <span class="code-attr">animation</span>: <span class="code-value">pulse 2s ease-in-out infinite</span>;
+}
+
+<span class="code-attr">@keyframes</span> <span class="code-value">pulse</span> {
+  <span class="code-value">0%, 100%</span> { <span class="code-attr">opacity</span>: <span class="code-value">1</span>; }
+  <span class="code-value">50%</span> { <span class="code-attr">opacity</span>: <span class="code-value">0.7</span>; }
+}
+<span class="code-tag">&lt;/style&gt;</span>
+
+<span class="code-comment">&lt;!-- JavaScript交互 --&gt;</span>
+<span class="code-tag">&lt;script&gt;</span>
+<span class="code-attr">document</span>.<span class="code-value">addEventListener</span>(<span class="code-value">'DOMContentLoaded'</span>, <span class="code-value">function</span>() {
+  <span class="code-attr">const</span> <span class="code-value">points</span> = <span class="code-attr">document</span>.<span class="code-value">querySelectorAll</span>(<span class="code-value">'.point'</span>);
+  
+  <span class="code-value">points</span>.<span class="code-value">forEach</span>(<span class="code-value">point</span> => {
+    <span class="code-value">point</span>.<span class="code-value">addEventListener</span>(<span class="code-value">'click'</span>, <span class="code-value">function</span>() {
+      <span class="code-attr">const</span> <span class="code-value">pointName</span> = <span class="code-value">this</span>.<span class="code-value">getAttribute</span>(<span class="code-value">'data-point'</span>);
+      <span class="code-attr">highlightConnectedLines</span>(<span class="code-value">pointName</span>);
+    });
+  });
+});
+<span class="code-tag">&lt;/script&gt;</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+ </body>
+</html>
