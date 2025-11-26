@@ -10,6 +10,141 @@
 
     <style>
         /* =========================================
+           0. 侧边栏样式
+           ========================================= */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 260px;
+            background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+            color: white;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .sidebar-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: white;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 25px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.6;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: #60a5fa;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left-color: #3b82f6;
+        }
+
+        .nav-icon {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-label {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .sidebar-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(30, 58, 138, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1001;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-toggle:hover {
+            background: #1e40af;
+            transform: scale(1.05);
+        }
+
+        .sidebar-toggle i {
+            font-size: 1.2rem;
+        }
+
+        /* 移动设备上的侧边栏 */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+
+        /* 主内容区域调整 */
+        .main-content {
+            margin-left: 260px;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* =========================================
            1. 全局背景与布局 (Part 1 风格)
            ========================================= */
         body {
@@ -89,11 +224,88 @@
             font-size: 2.5rem;
             color: #1e3a8a;
             margin-top: 60px;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.05);
             z-index: 2;
         }
 
+        /* --- 新增：顶部交互区域样式 (文本框 & 搜索) --- */
+        .top-interaction-area {
+            width: 90%;
+            max-width: 800px;
+            margin: 0 auto 50px; /* 底部间距 */
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* 文本描述框样式 */
+        .desc-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 15px;
+            border: 2px dashed #7f8c8d; /* 虚线边框，提示可编辑 */
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(5px);
+            font-family: inherit;
+            font-size: 1rem;
+            color: #2c3e50;
+            resize: vertical; /* 允许用户拉伸高度 */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            box-sizing: border-box;
+        }
+
+        .desc-textarea:focus {
+            border-color: #3498db;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        /* 导航搜索栏样式 */
+        .global-search-bar {
+            display: flex;
+            gap: 10px;
+            background: white;
+            padding: 8px;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 1px solid #e0e0e0;
+        }
+
+        .global-search-bar input {
+            flex: 1;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            outline: none;
+            background: transparent;
+        }
+
+        .global-search-bar button {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+        }
+
+        .global-search-bar button:hover {
+            background: #3498db;
+            transform: translateY(-1px);
+        }
+        .global-search-bar button:active {
+            transform: translateY(0);
+        }
+
+        /* --- 现有的 Assignment Section 样式 --- */
         .assignment-section {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(12px);
@@ -105,6 +317,7 @@
             margin-bottom: 40px;
             z-index: 2;
             position: relative;
+            scroll-margin-top: 20px; /* 滚动定位时的顶部留白 */
         }
 
         .section-title {
@@ -274,7 +487,6 @@
         }
 
         /* --- Specific SVG Animations (Part 3) --- */
-        
         /* SVG 1 */
         #svg1 { cursor: pointer; transition: transform 0.3s ease; }
         #svg1:hover { transform: scale(1.02); }
@@ -299,7 +511,7 @@
         @keyframes flow{ to{ stroke-dashoffset: -1.0; } }
         .block{ width:.7px; height:.7px; rx:.08px; }
 
-        /* SVG 3 - Shiny Wrap for External Image */
+        /* SVG 3 */
         .shiny-wrap {
             position: relative; overflow: hidden; border-radius: 12px; display: inline-block;
             transform: translateZ(0); box-shadow: 0 4px 14px rgba(0,0,0,.08); transition: box-shadow .35s ease;
@@ -403,409 +615,566 @@
     </style>
 </head>
 <body>
-    <h1 class="main-title">Assignment 5</h1>
-
-    <div class="assignment-section">
-        <h2 class="section-title">Part 1: Realtime Singapore PSI</h2>
-        <div id="part1-container">
-            <div id="timestamp"></div>
-            <div id="controls">
-                <button id="refreshBtn" class="psi-btn">Refresh Data</button>
-                <span id="status" style="margin-left: 10px; color: #555;"></span>
+    <!-- 侧边栏 -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Assignment 5</div>
+            <div class="sidebar-subtitle">Integrated Project</div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Navigation</div>
+                <a href="#" class="nav-item active" data-target="overview">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-label">Overview</span>
+                </a>
             </div>
-            <div class="particle" style="width:60px;height:60px;top:10%;left:10%;animation-delay:0s;"></div>
-            <div class="particle" style="width:40px;height:40px;top:70%;left:70%;animation-delay:4s;"></div>
-            <div class="particle" style="width:50px;height:50px;top:30%;left:50%;animation-delay:6s;"></div>
-            <div class="particle" style="width:30px;height:30px;top:60%;left:30%;animation-delay:8s;"></div>
-            <div class="particle" style="width:70px;height:70px;top:20%;left:80%;animation-delay:10s;"></div>
-            <div class="moon"></div>
-            <div class="cloud"></div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">Assignments</div>
+                <a href="#" class="nav-item" data-target="section-part1">
+                    <span class="nav-icon">1️⃣</span>
+                    <span class="nav-label">Assignment 1</span>
+                </a>
+                <a href="#" class="nav-item" data-target="section-part2">
+                    <span class="nav-icon">2️⃣</span>
+                    <span class="nav-label">Assignment 2</span>
+                </a>
+                <a href="#" class="nav-item" data-target="section-part3">
+                    <span class="nav-icon">3️⃣</span>
+                    <span class="nav-label">Assignment 3</span>
+                </a>
+                <a href="#" class="nav-item" data-target="section-part4">
+                    <span class="nav-icon">4️⃣</span>
+                    <span class="nav-label">Assignment 4</span>
+                </a>
+            </div>
+        </nav>
+    </div>
 
-            <div class="psi-table-wrapper">
-                <table id="psiTable">
-                    <thead>
-                        <tr>
-                            <th>Reading Type</th>
-                            <th>North</th>
-                            <th>South</th>
-                            <th>East</th>
-                            <th>West</th>
-                            <th>Central</th>
-                        </tr>
-                    </thead>
-                    <tbody><tr><td colspan="6">Loading...</td></tr></tbody>
+    <!-- 侧边栏切换按钮 -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i>☰</i>
+    </button>
+
+    <!-- 主内容区域 -->
+    <div class="main-content">
+        <h1 class="main-title">Assignment 5</h1>
+
+        <div class="top-interaction-area">
+            <textarea class="desc-textarea" placeholder="在这里添加你的代码描述、笔记或修改记录..."></textarea>
+            
+            <div class="global-search-bar">
+                <input type="text" id="navInput" placeholder="Search to jump (e.g. '1', 'Part 2', 'heatmap')...">
+                <button id="navBtn" onclick="navigateToSection()">Go</button>
+            </div>
+        </div>
+
+        <!-- Overview 部分 -->
+        <div class="assignment-section" id="overview">
+            <h2 class="section-title">Overview</h2>
+            <div id="overview-content">
+                <p>This project integrates four assignments into a single comprehensive web application:</p>
+                <ul>
+                    <li><strong>Assignment 1:</strong> Real-time Singapore PSI data visualization</li>
+                    <li><strong>Assignment 2:</strong> SVG transformation examples and demonstrations</li>
+                    <li><strong>Assignment 3:</strong> Interactive SVG icons and graphics</li>
+                    <li><strong>Assignment 4:</strong> Complex data visualization with D3 heatmap</li>
+                </ul>
+                <p>Use the navigation on the left to explore each assignment in detail.</p>
+            </div>
+        </div>
+
+        <div class="assignment-section" id="section-part1">
+            <h2 class="section-title">Part 1: Realtime Singapore PSI</h2>
+            <div id="part1-container">
+                <div id="timestamp"></div>
+                <div id="controls">
+                    <button id="refreshBtn" class="psi-btn">Refresh Data</button>
+                    <span id="status" style="margin-left: 10px; color: #555;"></span>
+                </div>
+                <div class="particle" style="width:60px;height:60px;top:10%;left:10%;animation-delay:0s;"></div>
+                <div class="particle" style="width:40px;height:40px;top:70%;left:70%;animation-delay:4s;"></div>
+                <div class="particle" style="width:50px;height:50px;top:30%;left:50%;animation-delay:6s;"></div>
+                <div class="particle" style="width:30px;height:30px;top:60%;left:30%;animation-delay:8s;"></div>
+                <div class="particle" style="width:70px;height:70px;top:20%;left:80%;animation-delay:10s;"></div>
+                <div class="moon"></div>
+                <div class="cloud"></div>
+
+                <div class="psi-table-wrapper">
+                    <table id="psiTable">
+                        <thead>
+                            <tr>
+                                <th>Reading Type</th>
+                                <th>North</th>
+                                <th>South</th>
+                                <th>East</th>
+                                <th>West</th>
+                                <th>Central</th>
+                            </tr>
+                        </thead>
+                        <tbody><tr><td colspan="6">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="assignment-section" id="section-part2">
+            <h2 class="section-title">Part 2: SVG Transformation</h2>
+            <div id="part2-container">
+                <table class="svg-transform-table">
+                    <tr>
+                      <th>Original</th>
+                      <th>Mirror</th>
+                      <th>Rotate 180°</th>
+                      <th>Compress 50%</th>
+                      <th>Grayscale</th>
+                    </tr>
+                    <tr>
+                      <td><img src="SVG1.svg" alt="SVG1 Original"></td>
+                      <td><img src="SVG1.svg" class="mirror" alt="SVG1 Mirror"></td>
+                      <td><img src="SVG1.svg" class="rotate" alt="SVG1 Rotate"></td>
+                      <td><img src="SVG1.svg" class="compress" alt="SVG1 Compress"></td>
+                      <td><img src="SVG1.svg" class="gray" alt="SVG1 Gray"></td>
+                    </tr>
+                    <tr>
+                      <td><img src="SVG2.svg" alt="SVG2 Original"></td>
+                      <td><img src="SVG2.svg" class="mirror" alt="SVG2 Mirror"></td>
+                      <td><img src="SVG2.svg" class="rotate" alt="SVG2 Rotate"></td>
+                      <td><img src="SVG2.svg" class="compress" alt="SVG2 Compress"></td>
+                      <td><img src="SVG2.svg" class="gray" alt="SVG2 Gray"></td>
+                    </tr>
+                    <tr>
+                      <td><img src="SVG3.svg" alt="SVG3 Original"></td>
+                      <td><img src="SVG3.svg" class="mirror" alt="SVG3 Mirror"></td>
+                      <td><img src="SVG3.svg" class="rotate" alt="SVG3 Rotate"></td>
+                      <td><img src="SVG3.svg" class="compress" alt="SVG3 Compress"></td>
+                      <td><img src="SVG3.svg" class="gray" alt="SVG3 Gray"></td>
+                    </tr>
+                    <tr>
+                      <td><img src="SVG4.svg" alt="SVG4 Original"></td>
+                      <td><img src="SVG4.svg" class="mirror" alt="SVG4 Mirror"></td>
+                      <td><img src="SVG4.svg" class="rotate" alt="SVG4 Rotate"></td>
+                      <td><img src="SVG4.svg" class="compress" alt="SVG4 Compress"></td>
+                      <td><img src="SVG4.svg" class="gray" alt="SVG4 Gray"></td>
+                    </tr>
+                    <tr>
+                      <td><img src="SVG5.svg" alt="SVG5 Original"></td>
+                      <td><img src="SVG5.svg" class="mirror" alt="SVG5 Mirror"></td>
+                      <td><img src="SVG5.svg" class="rotate" alt="SVG5 Rotate"></td>
+                      <td><img src="SVG5.svg" class="compress" alt="SVG5 Compress"></td>
+                      <td><img src="SVG5.svg" class="gray" alt="SVG5 Gray"></td>
+                    </tr>
+                    <tr>
+                      <td><img src="SVG6.svg" alt="SVG6 Original"></td>
+                      <td><img src="SVG6.svg" class="mirror" alt="SVG6 Mirror"></td>
+                      <td><img src="SVG6.svg" class="rotate" alt="SVG6 Rotate"></td>
+                      <td><img src="SVG6.svg" class="compress" alt="SVG6 Compress"></td>
+                      <td><img src="SVG6.svg" class="gray" alt="SVG6 Gray"></td>
+                    </tr>
+                    <tr>
+                      <td><img src="SVG7.svg" alt="SVG7 Original"></td>
+                      <td><img src="SVG7.svg" class="mirror" alt="SVG7 Mirror"></td>
+                      <td><img src="SVG7.svg" class="rotate" alt="SVG7 Rotate"></td>
+                      <td><img src="SVG7.svg" class="compress" alt="SVG7 Compress"></td>
+                      <td><img src="SVG7.svg" class="gray" alt="SVG7 Gray"></td>
+                    </tr>
+                    <tr>
+                      <td><img src="SVG8.svg" alt="SVG8 Original"></td>
+                      <td><img src="SVG8.svg" class="mirror" alt="SVG8 Mirror"></td>
+                      <td><img src="SVG8.svg" class="rotate" alt="SVG8 Rotate"></td>
+                      <td><img src="SVG8.svg" class="compress" alt="SVG8 Compress"></td>
+                      <td><img src="SVG8.svg" class="gray" alt="SVG8 Gray"></td>
+                    </tr>
+                    <tr>
+                      <td><img src="SVG9.svg" alt="SVG9 Original"></td>
+                      <td><img src="SVG9.svg" class="mirror" alt="SVG9 Mirror"></td>
+                      <td><img src="SVG9.svg" class="rotate" alt="SVG9 Rotate"></td>
+                      <td><img src="SVG9.svg" class="compress" alt="SVG9 Compress"></td>
+                      <td><img src="SVG9.svg" class="gray" alt="SVG9 Gray"></td>
+                    </tr>
+                    <tr>
+                      <td><img src="SVG10.svg" alt="SVG10 Original"></td>
+                      <td><img src="SVG10.svg" class="mirror" alt="SVG10 Mirror"></td>
+                      <td><img src="SVG10.svg" class="rotate" alt="SVG10 Rotate"></td>
+                      <td><img src="SVG10.svg" class="compress" alt="SVG10 Compress"></td>
+                      <td><img src="SVG10.svg" class="gray" alt="SVG10 Gray"></td>
+                    </tr>
                 </table>
             </div>
         </div>
-    </div>
 
-    <div class="assignment-section">
-        <h2 class="section-title">Part 2: SVG Transformation</h2>
-        <div id="part2-container">
-            <table class="svg-transform-table">
-                <tr>
-                  <th>Original</th>
-                  <th>Mirror</th>
-                  <th>Rotate 180°</th>
-                  <th>Compress 50%</th>
-                  <th>Grayscale</th>
-                </tr>
-                <tr>
-                  <td><img src="SVG1.svg" alt="SVG1 Original"></td>
-                  <td><img src="SVG1.svg" class="mirror" alt="SVG1 Mirror"></td>
-                  <td><img src="SVG1.svg" class="rotate" alt="SVG1 Rotate"></td>
-                  <td><img src="SVG1.svg" class="compress" alt="SVG1 Compress"></td>
-                  <td><img src="SVG1.svg" class="gray" alt="SVG1 Gray"></td>
-                </tr>
-                <tr>
-                  <td><img src="SVG2.svg" alt="SVG2 Original"></td>
-                  <td><img src="SVG2.svg" class="mirror" alt="SVG2 Mirror"></td>
-                  <td><img src="SVG2.svg" class="rotate" alt="SVG2 Rotate"></td>
-                  <td><img src="SVG2.svg" class="compress" alt="SVG2 Compress"></td>
-                  <td><img src="SVG2.svg" class="gray" alt="SVG2 Gray"></td>
-                </tr>
-                <tr>
-                  <td><img src="SVG3.svg" alt="SVG3 Original"></td>
-                  <td><img src="SVG3.svg" class="mirror" alt="SVG3 Mirror"></td>
-                  <td><img src="SVG3.svg" class="rotate" alt="SVG3 Rotate"></td>
-                  <td><img src="SVG3.svg" class="compress" alt="SVG3 Compress"></td>
-                  <td><img src="SVG3.svg" class="gray" alt="SVG3 Gray"></td>
-                </tr>
-                <tr>
-                  <td><img src="SVG4.svg" alt="SVG4 Original"></td>
-                  <td><img src="SVG4.svg" class="mirror" alt="SVG4 Mirror"></td>
-                  <td><img src="SVG4.svg" class="rotate" alt="SVG4 Rotate"></td>
-                  <td><img src="SVG4.svg" class="compress" alt="SVG4 Compress"></td>
-                  <td><img src="SVG4.svg" class="gray" alt="SVG4 Gray"></td>
-                </tr>
-                <tr>
-                  <td><img src="SVG5.svg" alt="SVG5 Original"></td>
-                  <td><img src="SVG5.svg" class="mirror" alt="SVG5 Mirror"></td>
-                  <td><img src="SVG5.svg" class="rotate" alt="SVG5 Rotate"></td>
-                  <td><img src="SVG5.svg" class="compress" alt="SVG5 Compress"></td>
-                  <td><img src="SVG5.svg" class="gray" alt="SVG5 Gray"></td>
-                </tr>
-                <tr>
-                  <td><img src="SVG6.svg" alt="SVG6 Original"></td>
-                  <td><img src="SVG6.svg" class="mirror" alt="SVG6 Mirror"></td>
-                  <td><img src="SVG6.svg" class="rotate" alt="SVG6 Rotate"></td>
-                  <td><img src="SVG6.svg" class="compress" alt="SVG6 Compress"></td>
-                  <td><img src="SVG6.svg" class="gray" alt="SVG6 Gray"></td>
-                </tr>
-                <tr>
-                  <td><img src="SVG7.svg" alt="SVG7 Original"></td>
-                  <td><img src="SVG7.svg" class="mirror" alt="SVG7 Mirror"></td>
-                  <td><img src="SVG7.svg" class="rotate" alt="SVG7 Rotate"></td>
-                  <td><img src="SVG7.svg" class="compress" alt="SVG7 Compress"></td>
-                  <td><img src="SVG7.svg" class="gray" alt="SVG7 Gray"></td>
-                </tr>
-                <tr>
-                  <td><img src="SVG8.svg" alt="SVG8 Original"></td>
-                  <td><img src="SVG8.svg" class="mirror" alt="SVG8 Mirror"></td>
-                  <td><img src="SVG8.svg" class="rotate" alt="SVG8 Rotate"></td>
-                  <td><img src="SVG8.svg" class="compress" alt="SVG8 Compress"></td>
-                  <td><img src="SVG8.svg" class="gray" alt="SVG8 Gray"></td>
-                </tr>
-                <tr>
-                  <td><img src="SVG9.svg" alt="SVG9 Original"></td>
-                  <td><img src="SVG9.svg" class="mirror" alt="SVG9 Mirror"></td>
-                  <td><img src="SVG9.svg" class="rotate" alt="SVG9 Rotate"></td>
-                  <td><img src="SVG9.svg" class="compress" alt="SVG9 Compress"></td>
-                  <td><img src="SVG9.svg" class="gray" alt="SVG9 Gray"></td>
-                </tr>
-                <tr>
-                  <td><img src="SVG10.svg" alt="SVG10 Original"></td>
-                  <td><img src="SVG10.svg" class="mirror" alt="SVG10 Mirror"></td>
-                  <td><img src="SVG10.svg" class="rotate" alt="SVG10 Rotate"></td>
-                  <td><img src="SVG10.svg" class="compress" alt="SVG10 Compress"></td>
-                  <td><img src="SVG10.svg" class="gray" alt="SVG10 Gray"></td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
-    <div class="assignment-section">
-        <h2 class="section-title">Part 3: Interactive Icon & SVGs</h2>
-        <div id="part3-container">
-            <div class="svg-grid">
-                <div class="svg-card">
-                    <div class="svg-header"><div class="svg-title">SVG one</div><div class="svg-number">1</div></div>
-                    <div class="svg-container">
-                        <svg id="svg1" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 10 10">
-                            <rect x="0" y="0" width="10" height="10" fill="white"/>
-                            <g class="grid-lines">
-                                <g class="grid-line" stroke="#e8e8e8" stroke-width="0.01">
-                                    <path d="M0 0.5 H10 M0 1.5 H10 M0 2.5 H10 M0 3.5 H10 M0 4.5 H10 M0 5.5 H10 M0 6.5 H10 M0 7.5 H10 M0 8.5 H10 M0 9.5 H10"/>
-                                    <path d="M0.5 0 V10 M1.5 0 V10 M2.5 0 V10 M3.5 0 V10 M4.5 0 V10 M5.5 0 V10 M6.5 0 V10 M7.5 0 V10 M8.5 0 V10 M9.5 0 V10"/>
+        <div class="assignment-section" id="section-part3">
+            <h2 class="section-title">Part 3: Interactive Icon & SVGs</h2>
+            <div id="part3-container">
+                <div class="svg-grid">
+                    <div class="svg-card">
+                        <div class="svg-header"><div class="svg-title">SVG one</div><div class="svg-number">1</div></div>
+                        <div class="svg-container">
+                            <svg id="svg1" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 10 10">
+                                <rect x="0" y="0" width="10" height="10" fill="white"/>
+                                <g class="grid-lines">
+                                    <g class="grid-line" stroke="#e8e8e8" stroke-width="0.01">
+                                        <path d="M0 0.5 H10 M0 1.5 H10 M0 2.5 H10 M0 3.5 H10 M0 4.5 H10 M0 5.5 H10 M0 6.5 H10 M0 7.5 H10 M0 8.5 H10 M0 9.5 H10"/>
+                                        <path d="M0.5 0 V10 M1.5 0 V10 M2.5 0 V10 M3.5 0 V10 M4.5 0 V10 M5.5 0 V10 M6.5 0 V10 M7.5 0 V10 M8.5 0 V10 M9.5 0 V10"/>
+                                    </g>
+                                    <g class="grid-line" stroke="#bdbdbd" stroke-width="0.02">
+                                        <path d="M0 0 H10 M0 1 H10 M0 2 H10 M0 3 H10 M0 4 H10 M0 5 H10 M0 6 H10 M0 7 H10 M0 8 H10 M0 9 H10 M0 10 H10"/>
+                                        <path d="M0 0 V10 M1 0 V10 M2 0 V10 M3 0 V10 M4 0 V10 M5 0 V10 M6 0 V10 M7 0 V10 M8 0 V10 M9 0 V10 M10 0 V10"/>
+                                    </g>
                                 </g>
-                                <g class="grid-line" stroke="#bdbdbd" stroke-width="0.02">
-                                    <path d="M0 0 H10 M0 1 H10 M0 2 H10 M0 3 H10 M0 4 H10 M0 5 H10 M0 6 H10 M0 7 H10 M0 8 H10 M0 9 H10 M0 10 H10"/>
-                                    <path d="M0 0 V10 M1 0 V10 M2 0 V10 M3 0 V10 M4 0 V10 M5 0 V10 M6 0 V10 M7 0 V10 M8 0 V10 M9 0 V10 M10 0 V10"/>
+                                <rect x="0" y="0" width="10" height="10" fill="none" stroke="#888" stroke-width="0.04"/>
+                                <defs>
+                                    <marker id="arrow-blue" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#1976d2"/></marker>
+                                    <marker id="arrow-black" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#000"/></marker>
+                                </defs>
+                                <g id="interactive-points">
+                                    <circle class="point" cx="1" cy="1" r="0.05" fill="#ff6b6b" data-point="A"/>
+                                    <circle class="point" cx="1" cy="4" r="0.05" fill="#4ecdc4" data-point="B"/>
+                                    <circle class="point" cx="3" cy="3" r="0.05" fill="#45b7d1" data-point="D"/>
+                                    <circle class="point" cx="3" cy="6" r="0.05" fill="#96ceb4" data-point="C"/>
                                 </g>
-                            </g>
-                            <rect x="0" y="0" width="10" height="10" fill="none" stroke="#888" stroke-width="0.04"/>
-                            <defs>
-                                <marker id="arrow-blue" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#1976d2"/></marker>
-                                <marker id="arrow-black" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#000"/></marker>
-                            </defs>
-                            <g id="interactive-points">
-                                <circle class="point" cx="1" cy="1" r="0.05" fill="#ff6b6b" data-point="A"/>
-                                <circle class="point" cx="1" cy="4" r="0.05" fill="#4ecdc4" data-point="B"/>
-                                <circle class="point" cx="3" cy="3" r="0.05" fill="#45b7d1" data-point="D"/>
-                                <circle class="point" cx="3" cy="6" r="0.05" fill="#96ceb4" data-point="C"/>
-                            </g>
-                            <polyline id="abcd" points="1,1 1,4 3,6 3,3 1,1" fill="none" stroke="#000" stroke-width="0.08" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="12" stroke-dashoffset="0">
-                                <animate attributeName="stroke-dashoffset" values="12;0;0" keyTimes="0;0.1667;1" dur="12s" repeatCount="indefinite" />
-                            </polyline>
-                            <g font-size="0.35" fill="#000" text-anchor="start" dominant-baseline="middle">
-                                <text x="0.5" y="1">A <animate attributeName="opacity" values="1;0.3;1" dur="1.6s" repeatCount="indefinite" /></text>
-                                <text x="0.5" y="4">B <animate attributeName="opacity" values="1;0.3;1" dur="1.6s" begin="0.2s" repeatCount="indefinite" /></text>
-                                <text x="3.2" y="3">D <animate attributeName="opacity" values="1;0.3;1" dur="1.6s" begin="0.4s" repeatCount="indefinite" /></text>
-                                <text x="3.2" y="6">C <animate attributeName="opacity" values="1;0.3;1" dur="1.6s" begin="0.6s" repeatCount="indefinite" /></text>
-                            </g>
-                            <line id="DA" class="line-animation" x1="3" y1="6" x2="1" y2="1" stroke="#1976d2" stroke-width="0.08" stroke-dasharray="0.2 0.2" marker-end="url(#arrow-blue)">
-                                <animate attributeName="stroke-dashoffset" from="0" to="0.4" dur="0.6s" repeatCount="indefinite" />
-                            </line>
-                            <line id="CB" class="line-animation" x1="3" y1="3" x2="1" y2="4" stroke="#000" stroke-width="0.08" stroke-dasharray="0.2 0.2" marker-end="url(#arrow-black)">
-                                <animate attributeName="stroke-dashoffset" from="0" to="0.4" dur="0.6s" repeatCount="indefinite" />
-                            </line>
-                        </svg>
-                    </div>
-                    <div class="note-section">
-                        <div class="note-label"><i>笔记</i><span>Note</span></div>
-                        <div class="svg1-notes" style="font:14px/1.6 system-ui,sans-serif; color:#111;">
-                            <ol style="margin:0; padding-left:18px;">
-                                <li>The first step is to draw a canvas of several by several centimeters.</li>
-                                <li>The second step is to draw a parallelogram on it, and the coordinates of its four points are as follows.</li>
-                                <li>The third step is to connect the two diagonals and indicate the direction of the arrows with which two coordinates.</li>
-                                <li>The fourth step is to add some animation effects using D3 and CSS.</li>
-                            </ol>
-                            <div class="process-link" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db;">
-                                <h4 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 16px;">📖 制作过程详解</h4>
-                                <p style="margin: 0 0 12px 0; color: #555; font-size: 14px; line-height: 1.5;">探索这个SVG图形的完整制作流程，包括每个步骤的中间效果和详细说明。</p>
-                                <a href="svg1-process.html" class="process-btn">🔍 查看详细制作过程</a>
+                                <polyline id="abcd" points="1,1 1,4 3,6 3,3 1,1" fill="none" stroke="#000" stroke-width="0.08" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="12" stroke-dashoffset="0">
+                                    <animate attributeName="stroke-dashoffset" values="12;0;0" keyTimes="0;0.1667;1" dur="12s" repeatCount="indefinite" />
+                                </polyline>
+                                <g font-size="0.35" fill="#000" text-anchor="start" dominant-baseline="middle">
+                                    <text x="0.5" y="1">A <animate attributeName="opacity" values="1;0.3;1" dur="1.6s" repeatCount="indefinite" /></text>
+                                    <text x="0.5" y="4">B <animate attributeName="opacity" values="1;0.3;1" dur="1.6s" begin="0.2s" repeatCount="indefinite" /></text>
+                                    <text x="3.2" y="3">D <animate attributeName="opacity" values="1;0.3;1" dur="1.6s" begin="0.4s" repeatCount="indefinite" /></text>
+                                    <text x="3.2" y="6">C <animate attributeName="opacity" values="1;0.3;1" dur="1.6s" begin="0.6s" repeatCount="indefinite" /></text>
+                                </g>
+                                <line id="DA" class="line-animation" x1="3" y1="6" x2="1" y2="1" stroke="#1976d2" stroke-width="0.08" stroke-dasharray="0.2 0.2" marker-end="url(#arrow-blue)">
+                                    <animate attributeName="stroke-dashoffset" from="0" to="0.4" dur="0.6s" repeatCount="indefinite" />
+                                </line>
+                                <line id="CB" class="line-animation" x1="3" y1="3" x2="1" y2="4" stroke="#000" stroke-width="0.08" stroke-dasharray="0.2 0.2" marker-end="url(#arrow-black)">
+                                    <animate attributeName="stroke-dashoffset" from="0" to="0.4" dur="0.6s" repeatCount="indefinite" />
+                                </line>
+                            </svg>
+                        </div>
+                        <div class="note-section">
+                            <div class="note-label"><i>笔记</i><span>Note</span></div>
+                            <div class="svg1-notes" style="font:14px/1.6 system-ui,sans-serif; color:#111;">
+                                <ol style="margin:0; padding-left:18px;">
+                                    <li>The first step is to draw a canvas of several by several centimeters.</li>
+                                    <li>The second step is to draw a parallelogram on it, and the coordinates of its four points are as follows.</li>
+                                    <li>The third step is to connect the two diagonals and indicate the direction of the arrows with which two coordinates.</li>
+                                    <li>The fourth step is to add some animation effects using D3 and CSS.</li>
+                                </ol>
+                                <div class="process-link" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db;">
+                                    <h4 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 16px;">📖 制作过程详解</h4>
+                                    <p style="margin: 0 0 12px 0; color: #555; font-size: 14px; line-height: 1.5;">探索这个SVG图形的完整制作流程，包括每个步骤的中间效果和详细说明。</p>
+                                    <a href="svg1-process.html" class="process-btn">🔍 查看详细制作过程</a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="svg-card">
-                    <div class="svg-header"><div class="svg-title">SVG two</div><div class="svg-number">2</div></div>
-                    <div class="svg-container">
-                        <svg id="scene" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 20 20" aria-label="optimisation route">
-                            <defs>
-                                <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3.2" markerHeight="3.2" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#111"/></marker>
-                                <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0.08" dy="0.08" stdDeviation="0.12" flood-color="#000" flood-opacity="0.25"/></filter>
-                            </defs>
-                            <g transform="translate(1,1)">
-                                <g class="gridMinor">
-                                    <path d="M0 .5 H18 M0 1.0 H18 M0 1.5 H18 M0 2.0 H18 M0 2.5 H18 M0 3.0 H18 M0 3.5 H18 M0 4.0 H18 M0 4.5 H18 M0 5.0 H18 M0 5.5 H18 M0 6.0 H18 M0 6.5 H18 M0 7.0 H18 M0 7.5 H18 M0 8.0 H18 M0 8.5 H18 M0 9.0 H18 M0 9.5 H18 M0 10.0 H18 M0 10.5 H18 M0 11.0 H18 M0 11.5 H18 M0 12.0 H18 M0 12.5 H18 M0 13.0 H18 M0 13.5 H18 M0 14.0 H18 M0 14.5 H18 M0 15.0 H18 M0 15.5 H18 M0 16.0 H18 M0 16.5 H18 M0 17.0 H18 M0 17.5 H18"/>
-                                    <path d="M.5 0 V18 M1.0 0 V18 M1.5 0 V18 M2.0 0 V18 M2.5 0 V18 M3.0 0 V18 M3.5 0 V18 M4.0 0 V18 M4.5 0 V18 M5.0 0 V18 M5.5 0 V18 M6.0 0 V18 M6.5 0 V18 M7.0 0 V18 M7.5 0 V18 M8.0 0 V18 M8.5 0 V18 M9.0 0 V18 M9.5 0 V18 M10.0 0 V18 M10.5 0 V18 M11.0 0 V18 M11.5 0 V18 M12.0 0 V18 M12.5 0 V18 M13.0 0 V18 M13.5 0 V18 M14.0 0 V18 M14.5 0 V18 M15.0 0 V18 M15.5 0 V18 M16.0 0 V18 M16.5 0 V18 M17.0 0 V18 M17.5 0 V18"/>
+                    <div class="svg-card">
+                        <div class="svg-header"><div class="svg-title">SVG two</div><div class="svg-number">2</div></div>
+                        <div class="svg-container">
+                            <svg id="scene" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 20 20" aria-label="optimisation route">
+                                <defs>
+                                    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="3.2" markerHeight="3.2" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#111"/></marker>
+                                    <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0.08" dy="0.08" stdDeviation="0.12" flood-color="#000" flood-opacity="0.25"/></filter>
+                                </defs>
+                                <g transform="translate(1,1)">
+                                    <g class="gridMinor">
+                                        <path d="M0 .5 H18 M0 1.0 H18 M0 1.5 H18 M0 2.0 H18 M0 2.5 H18 M0 3.0 H18 M0 3.5 H18 M0 4.0 H18 M0 4.5 H18 M0 5.0 H18 M0 5.5 H18 M0 6.0 H18 M0 6.5 H18 M0 7.0 H18 M0 7.5 H18 M0 8.0 H18 M0 8.5 H18 M0 9.0 H18 M0 9.5 H18 M0 10.0 H18 M0 10.5 H18 M0 11.0 H18 M0 11.5 H18 M0 12.0 H18 M0 12.5 H18 M0 13.0 H18 M0 13.5 H18 M0 14.0 H18 M0 14.5 H18 M0 15.0 H18 M0 15.5 H18 M0 16.0 H18 M0 16.5 H18 M0 17.0 H18 M0 17.5 H18"/>
+                                        <path d="M.5 0 V18 M1.0 0 V18 M1.5 0 V18 M2.0 0 V18 M2.5 0 V18 M3.0 0 V18 M3.5 0 V18 M4.0 0 V18 M4.5 0 V18 M5.0 0 V18 M5.5 0 V18 M6.0 0 V18 M6.5 0 V18 M7.0 0 V18 M7.5 0 V18 M8.0 0 V18 M8.5 0 V18 M9.0 0 V18 M9.5 0 V18 M10.0 0 V18 M10.5 0 V18 M11.0 0 V18 M11.5 0 V18 M12.0 0 V18 M12.5 0 V18 M13.0 0 V18 M13.5 0 V18 M14.0 0 V18 M14.5 0 V18 M15.0 0 V18 M15.5 0 V18 M16.0 0 V18 M16.5 0 V18 M17.0 0 V18 M17.5 0 V18"/>
+                                    </g>
+                                    <g class="gridMajor">
+                                        <path d="M0 1 H18 M0 2 H18 M0 3 H18 M0 4 H18 M0 5 H18 M0 6 H18 M0 7 H18 M0 8 H18 M0 9 H18 M0 10 H18 M0 11 H18 M0 12 H18 M0 13 H18 M0 14 H18 M0 15 H18 M0 16 H18 M0 17 H18"/>
+                                        <path d="M1 0 V18 M2 0 V18 M3 0 V18 M4 0 V18 M5 0 V18 M6 0 V18 M7 0 V18 M8 0 V18 M9 0 V18 M10 0 V18 M11 0 V18 M12 0 V18 M13 0 V18 M14 0 V18 M15 0 V18 M16 0 V18 M17 0 V18"/>
+                                    </g>
+                                    <rect class="frame" x="0" y="0" width="18" height="18"/>
+                                    <line id="startSeg" class="start" x1="5.78" y1="1.48" x2="6.02" y2="3.65"/>
+                                    <text class="label" x="4.9" y="1.2" font-style="italic">random start</text>
+                                    <polyline id="routeBase" points="6.00,4.20 5.60,5.80 5.10,7.40 4.40,8.80 4.10,9.60 4.70,10.20 5.40,10.60 4.40,11.00 4.20,10.00 4.90,9.40 6.00,10.00 7.00,10.00 8.60,9.60 9.80,9.00 11.00,9.00 12.00,9.30 13.50,8.60 14.20,8.00 12.60,8.00" fill="none" stroke="none"/>
+                                    <g id="bandLayer"></g>
+                                    <g id="routeSegments"></g>
+                                    <path id="motionPath" d="" fill="none" stroke="transparent"/>
+                                    <rect id="blockBlue" class="block" fill="#3b82f6"></rect>
+                                    <rect id="blockRed" class="block" fill="#ef4444"></rect>
+                                    <g id="endpoints"></g>
+                                    <text class="hint" x="11.6" y="12.8"><tspan class="hint-blue" x="11.6" dy="0">covered space</tspan><tspan class="hint-gray" x="11.6" dy="0.7">no coverage</tspan></text>
                                 </g>
-                                <g class="gridMajor">
-                                    <path d="M0 1 H18 M0 2 H18 M0 3 H18 M0 4 H18 M0 5 H18 M0 6 H18 M0 7 H18 M0 8 H18 M0 9 H18 M0 10 H18 M0 11 H18 M0 12 H18 M0 13 H18 M0 14 H18 M0 15 H18 M0 16 H18 M0 17 H18"/>
-                                    <path d="M1 0 V18 M2 0 V18 M3 0 V18 M4 0 V18 M5 0 V18 M6 0 V18 M7 0 V18 M8 0 V18 M9 0 V18 M10 0 V18 M11 0 V18 M12 0 V18 M13 0 V18 M14 0 V18 M15 0 V18 M16 0 V18 M17 0 V18"/>
-                                </g>
-                                <rect class="frame" x="0" y="0" width="18" height="18"/>
-                                <line id="startSeg" class="start" x1="5.78" y1="1.48" x2="6.02" y2="3.65"/>
-                                <text class="label" x="4.9" y="1.2" font-style="italic">random start</text>
-                                <polyline id="routeBase" points="6.00,4.20 5.60,5.80 5.10,7.40 4.40,8.80 4.10,9.60 4.70,10.20 5.40,10.60 4.40,11.00 4.20,10.00 4.90,9.40 6.00,10.00 7.00,10.00 8.60,9.60 9.80,9.00 11.00,9.00 12.00,9.30 13.50,8.60 14.20,8.00 12.60,8.00" fill="none" stroke="none"/>
-                                <g id="bandLayer"></g>
-                                <g id="routeSegments"></g>
-                                <path id="motionPath" d="" fill="none" stroke="transparent"/>
-                                <rect id="blockBlue" class="block" fill="#3b82f6"></rect>
-                                <rect id="blockRed" class="block" fill="#ef4444"></rect>
-                                <g id="endpoints"></g>
-                                <text class="hint" x="11.6" y="12.8"><tspan class="hint-blue" x="11.6" dy="0">covered space</tspan><tspan class="hint-gray" x="11.6" dy="0.7">no coverage</tspan></text>
-                            </g>
-                        </svg>
-                    </div>
-                    <div class="note-section">
-                        <div class="note-label"><i>笔记</i><span>Note</span></div>
-                        <div class="svg1-notes" style="font:14px/1.6 system-ui,sans-serif; color:#111;">
-                            <ol style="margin:0; padding-left:18px;">
-                                <li>The first step is to draw a canvas of several by several centimeters.</li>
-                                <li>The second step is to randomly generate a line segment with an arrowhead and label it as "Random star".</li>
-                                <li>The third step is to randomly plan a path based on the initial arrowed line segment and generate approximately 15 small arrowed line segments.</li>
-                                <li>The fourth step is to mark the flow path of the line segments with a light blue transparent area.</li>
-                                <li>The fifth step is to mark X and X' and label the covered space in blue font and the no coverage area in black font.</li>
-                                <li>The sixth step is to make the start and end points move between each other using D3 and CSS.</li>
-                            </ol>
-<div class="process-link" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db;">
-                                <h4 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 16px;">📖 制作过程详解</h4>
-                                <p style="margin: 0 0 12px 0; color: #555; font-size: 14px; line-height: 1.5;">探索这个SVG图形的完整制作流程，包括每个步骤的中间效果和详细说明。</p>
-                                <a href="svg2-process.html" class="process-btn">🔍 查看详细制作过程</a>
+                            </svg>
+                        </div>
+                        <div class="note-section">
+                            <div class="note-label"><i>笔记</i><span>Note</span></div>
+                            <div class="svg1-notes" style="font:14px/1.6 system-ui,sans-serif; color:#111;">
+                                <ol style="margin:0; padding-left:18px;">
+                                    <li>The first step is to draw a canvas of several by several centimeters.</li>
+                                    <li>The second step is to randomly generate a line segment with an arrowhead and label it as "Random star".</li>
+                                    <li>The third step is to randomly plan a path based on the initial arrowed line segment and generate approximately 15 small arrowed line segments.</li>
+                                    <li>The fourth step is to mark the flow path of the line segments with a light blue transparent area.</li>
+                                    <li>The fifth step is to mark X and X' and label the covered space in blue font and the no coverage area in black font.</li>
+                                    <li>The sixth step is to make the start and end points move between each other using D3 and CSS.</li>
+                                </ol>
                             </div>
-
-                        </div>
-                    </div>
-                </div>
-
-                <div class="svg-card">
-                    <div class="svg-header"><div class="svg-title">SVG three</div><div class="svg-number">3</div></div>
-                    <div class="svg-container">
-                        <div class="shiny-wrap" aria-label="SVG3 with shimmer and hover zoom">
-                            <img src="Assignment3 SVG3.svg" class="shiny-img" alt="Shiny SVG" style="width:100%; height:100%;">
-                        </div>
-                    </div>
-                    <div class="note-section">
-                        <div class="note-label"><i>笔记</i><span>Note</span></div>
-                        <div class="svg3-notes" style="font:14px/1.6 system-ui,sans-serif; color:#111;">
-                            <ol style="margin:0; padding-left:18px;">
-                                <li>The first step is to convert the PNG file to an SVG file.</li>
-                                <li>The second step is to beautify the SVG using D3 and CSS.</li>
-                                <li>The third step is to proportionally reduce its size so that it can be placed in HTML.</li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="svg-card">
-                    <div class="svg-header"><div class="svg-title">SVG four</div><div class="svg-number">4</div></div>
-                    <div class="svg-container">
-                        <svg id="svg4" xmlns="http://www.w3.org/2000/svg" width="450" height="600" viewBox="0 0 900 700" aria-label="PDF chart">
-                            <defs>
-                                <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
-                                    <feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-                                </filter>
-                            </defs>
-                            <g id="plot4" transform="translate(180,170)">
-                                <rect x="0" y="0" width="550" height="380" fill="#ffffff" stroke="#e5e7eb" stroke-width="2"/>
-                                <g stroke="#e5e7eb" stroke-width="1">
-                                    <path d="M70 0 V380 M140 0 V380 M210 0 V380 M280 0 V380 M350 0 V380 M420 0 V380 M490 0 V380"/>
-                                    <path d="M0 54 H550 M0 108 H550 M0 162 H550 M0 216 H550 M0 270 H550 M0 324 H550 M0 368 H550"/>
-                                </g>
-                                <g transform="translate(340,20)" font-family="Georgia, 'Times New Roman', serif" font-size="18" fill="#111827">
-                                    <rect x="0" y="-10" width="26" height="4" fill="#eab54f"/>
-                                    <text x="28" y="0">黄色：p(x, y = 0) · ν(x)</text>
-                                    <rect x="0" y="28" width="26" height="4" fill="#1f8aa6"/>
-                                    <text x="28" y="40">青色：p(x, y = 1) · ν(x)</text>
-                                </g>
-                                <g stroke="#111827" stroke-width="2">
-                                    <line x1="0" y1="380" x2="540" y2="380"/><polygon points="540,380 520,370 520,390" fill="#111827"/><line x1="0" y1="380" x2="0" y2="0"/><polygon points="0,0 -8,14 8,14" fill="#111827"/>
-                                </g>
-                                <g stroke="#111827" stroke-width="2">
-                                    <path d="M0 380 v-8 M70 380 v-8 M140 380 v-8 M210 380 v-8 M280 380 v-8 M350 380 v-8 M420 380 v-8 M490 380 v-8"/>
-                                    <path d="M0 360 h8 M0 326 h8 M0 272 h8 M0 218 h8 M0 164 h8 M0 110 h8 M0 56 h8 M0 2 h8"/>
-                                </g>
-                                <g font-family="system-ui" fill="#374151" font-size="18">
-                                    <g text-anchor="middle"><text x="0" y="410">−2</text><text x="70" y="410">−1</text><text x="140" y="410">0</text><text x="210" y="410">1</text><text x="280" y="410">2</text><text x="350" y="410">3</text><text x="420" y="410">4</text><text x="490" y="410">5</text></g>
-                                    <g text-anchor="end"><text x="-12" y="360">0.00</text><text x="-12" y="330">0.05</text><text x="-12" y="276">0.10</text><text x="-12" y="222">0.15</text><text x="-12" y="168">0.20</text><text x="-12" y="114">0.25</text><text x="-12" y="60">0.30</text><text x="-12" y="6">0.35</text></g>
-                                </g>
-                                <g stroke="#111827" stroke-width="2" stroke-dasharray="8 8" opacity="0.85">
-                                    <line x1="189" y1="380" x2="189" y2="40"/><line x1="231" y1="380" x2="231" y2="40"/><line x1="0" y1="380" x2="540" y2="380"/>
-                                </g>
-                                <polygon id="overlap" fill="#6b7280" fill-opacity="0.45" stroke="none"/>
-                                <path id="curve0" fill="none" stroke="#eab54f" stroke-width="3.5" opacity="0.98"/>
-                                <path id="curve1" fill="none" stroke="#1f8aa6" stroke-width="3.5" opacity="0.98"/>
-                                <circle id="xpointGlow" cx="213" cy="237" r="8"/>
-                                <circle id="xpoint" cx="213" cy="237" r="3"/>
-                            </g>
-                        </svg>
-                    </div>
-                    <div class="note-section">
-                        <div class="note-label"><i>笔记</i><span>Note</span></div>
-                        <div class="svg4-notes" style="font:14px/1.6 system-ui,sans-serif; color:#111;">
-                            <ol style="margin:0; padding-left:18px;">
-                                <li>The first step is to draw a canvas of several by several centimeters.</li>
-                                <li>The second step is to establish the X and Y axes on the canvas.</li>
-                                <li>The third step is to draw yellow and cyan curves based on the Probability Density.</li>
-                                <li>The fourth step is to draw two dotted lines at 0.3 to the left and right of 1 on the X-axis.</li>
-                                <li>The fifth step is to establish a function to describe the shaded area where the two curves overlap.</li>
-                                <li>The sixth step is to make marks and use CSS to beautify and animate them.</li>
-                            </ol>
                             <div class="process-link" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db;">
-                                <h4 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 16px;">📖 制作过程详解</h4>
-                                <p style="margin: 0 0 12px 0; color: #555; font-size: 14px; line-height: 1.5;">探索这个SVG图形的完整制作流程，包括每个步骤的中间效果和详细说明。</p>
-                                <a href="svg4-process.html" class="process-btn">🔍 查看详细制作过程</a>
+                                    <h4 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 16px;">📖 制作过程详解</h4>
+                                    <p style="margin: 0 0 12px 0; color: #555; font-size: 14px; line-height: 1.5;">探索这个SVG图形的完整制作流程，包括每个步骤的中间效果和详细说明。</p>
+                                    <a href="svg2-process.html" class="process-btn">🔍 查看详细制作过程</a>
+                                </div>
+                        </div>
+                    </div>
+
+                    <div class="svg-card">
+                        <div class="svg-header"><div class="svg-title">SVG three</div><div class="svg-number">3</div></div>
+                        <div class="svg-container">
+                            <div class="shiny-wrap" aria-label="SVG3 with shimmer and hover zoom">
+                                <img src="Assignment3 SVG3.svg" class="shiny-img" alt="Shiny SVG" style="width:100%; height:100%;">
+                            </div>
+                        </div>
+                        <div class="note-section">
+                            <div class="note-label"><i>笔记</i><span>Note</span></div>
+                            <div class="svg3-notes" style="font:14px/1.6 system-ui,sans-serif; color:#111;">
+                                <ol style="margin:0; padding-left:18px;">
+                                    <li>The first step is to convert the PNG file to an SVG file.</li>
+                                    <li>The second step is to beautify the SVG using D3 and CSS.</li>
+                                    <li>The third step is to proportionally reduce its size so that it can be placed in HTML.</li>
+                                </ol>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="svg-card">
-                    <div class="svg-header"><div class="svg-title">SVG five</div><div class="svg-number">5</div></div>
-                    <div class="svg-container">
-                        <svg id="svg5" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 600 400">
-                            <defs>
-                                <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                                    <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-                                </filter>
-                                <linearGradient id="redGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff0000" stop-opacity="0.8"/><stop offset="100%" stop-color="#ff6666" stop-opacity="0.8"/></linearGradient>
-                                <linearGradient id="greenGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00ff00" stop-opacity="0.8"/><stop offset="100%" stop-color="#66ff66" stop-opacity="0.8"/></linearGradient>
-                                <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0000ff" stop-opacity="0.8"/><stop offset="100%" stop-color="#6666ff" stop-opacity="0.8"/></linearGradient>
-                            </defs>
-                            <rect x="0" y="0" width="600" height="400" fill="#f8f9fa"/>
-                            <text x="300" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#333" font-weight="bold">three-primary colours</text>
-                            <circle id="mixCircle" cx="300" cy="200" r="80" fill="rgb(128,128,128)" filter="url(#glow)" stroke="#333" stroke-width="2"/>
-                            <g id="colorControls">
-                                <g class="color-control" data-color="red">
-                                    <circle id="redCircle" cx="150" cy="120" r="40" fill="url(#redGradient)" stroke="#cc0000" stroke-width="3" cursor="move" filter="url(#glow)"/>
-                                    <text x="150" y="125" text-anchor="middle" font-family="Arial" font-size="14" fill="#fff" font-weight="bold">R</text>
-                                    <circle id="redHandle" cx="150" cy="120" r="8" fill="#fff" stroke="#cc0000" stroke-width="2" cursor="move"/>
+                    <div class="svg-card">
+                        <div class="svg-header"><div class="svg-title">SVG four</div><div class="svg-number">4</div></div>
+                        <div class="svg-container">
+                            <svg id="svg4" xmlns="http://www.w3.org/2000/svg" width="450" height="600" viewBox="0 0 900 700" aria-label="PDF chart">
+                                <defs>
+                                    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+                                        <feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                                    </filter>
+                                </defs>
+                                <g id="plot4" transform="translate(180,170)">
+                                    <rect x="0" y="0" width="550" height="380" fill="#ffffff" stroke="#e5e7eb" stroke-width="2"/>
+                                    <g stroke="#e5e7eb" stroke-width="1">
+                                        <path d="M70 0 V380 M140 0 V380 M210 0 V380 M280 0 V380 M350 0 V380 M420 0 V380 M490 0 V380"/>
+                                        <path d="M0 54 H550 M0 108 H550 M0 162 H550 M0 216 H550 M0 270 H550 M0 324 H550 M0 368 H550"/>
+                                    </g>
+                                    <g transform="translate(340,20)" font-family="Georgia, 'Times New Roman', serif" font-size="18" fill="#111827">
+                                        <rect x="0" y="-10" width="26" height="4" fill="#eab54f"/>
+                                        <text x="28" y="0">黄色：p(x, y = 0) · ν(x)</text>
+                                        <rect x="0" y="28" width="26" height="4" fill="#1f8aa6"/>
+                                        <text x="28" y="40">青色：p(x, y = 1) · ν(x)</text>
+                                    </g>
+                                    <g stroke="#111827" stroke-width="2">
+                                        <line x1="0" y1="380" x2="540" y2="380"/><polygon points="540,380 520,370 520,390" fill="#111827"/><line x1="0" y1="380" x2="0" y2="0"/><polygon points="0,0 -8,14 8,14" fill="#111827"/>
+                                    </g>
+                                    <g stroke="#111827" stroke-width="2">
+                                        <path d="M0 380 v-8 M70 380 v-8 M140 380 v-8 M210 380 v-8 M280 380 v-8 M350 380 v-8 M420 380 v-8 M490 380 v-8"/>
+                                        <path d="M0 360 h8 M0 326 h8 M0 272 h8 M0 218 h8 M0 164 h8 M0 110 h8 M0 56 h8 M0 2 h8"/>
+                                    </g>
+                                    <g font-family="system-ui" fill="#374151" font-size="18">
+                                        <g text-anchor="middle"><text x="0" y="410">−2</text><text x="70" y="410">−1</text><text x="140" y="410">0</text><text x="210" y="410">1</text><text x="280" y="410">2</text><text x="350" y="410">3</text><text x="420" y="410">4</text><text x="490" y="410">5</text></g>
+                                        <g text-anchor="end"><text x="-12" y="360">0.00</text><text x="-12" y="330">0.05</text><text x="-12" y="276">0.10</text><text x="-12" y="222">0.15</text><text x="-12" y="168">0.20</text><text x="-12" y="114">0.25</text><text x="-12" y="60">0.30</text><text x="-12" y="6">0.35</text></g>
+                                    </g>
+                                    <g stroke="#111827" stroke-width="2" stroke-dasharray="8 8" opacity="0.85">
+                                        <line x1="189" y1="380" x2="189" y2="40"/><line x1="231" y1="380" x2="231" y2="40"/><line x1="0" y1="380" x2="540" y2="380"/>
+                                    </g>
+                                    <polygon id="overlap" fill="#6b7280" fill-opacity="0.45" stroke="none"/>
+                                    <path id="curve0" fill="none" stroke="#eab54f" stroke-width="3.5" opacity="0.98"/>
+                                    <path id="curve1" fill="none" stroke="#1f8aa6" stroke-width="3.5" opacity="0.98"/>
+                                    <circle id="xpointGlow" cx="213" cy="237" r="8"/>
+                                    <circle id="xpoint" cx="213" cy="237" r="3"/>
                                 </g>
-                                <g class="color-control" data-color="green">
-                                    <circle id="greenCircle" cx="150" cy="280" r="40" fill="url(#greenGradient)" stroke="#00cc00" stroke-width="3" cursor="move" filter="url(#glow)"/>
-                                    <text x="150" y="285" text-anchor="middle" font-family="Arial" font-size="14" fill="#fff" font-weight="bold">G</text>
-                                    <circle id="greenHandle" cx="150" cy="280" r="8" fill="#fff" stroke="#00cc00" stroke-width="2" cursor="move"/>
-                                </g>
-                                <g class="color-control" data-color="blue">
-                                    <circle id="blueCircle" cx="450" cy="200" r="40" fill="url(#blueGradient)" stroke="#0000cc" stroke-width="3" cursor="move" filter="url(#glow)"/>
-                                    <text x="450" y="205" text-anchor="middle" font-family="Arial" font-size="14" fill="#fff" font-weight="bold">B</text>
-                                    <circle id="blueHandle" cx="450" cy="200" r="8" fill="#fff" stroke="#0000cc" stroke-width="2" cursor="move"/>
-                                </g>
-                            </g>
-                            <line id="redLine" x1="150" y1="120" x2="300" y2="200" stroke="#ff0000" stroke-width="2" stroke-dasharray="5,5" opacity="0.6"/>
-                            <line id="greenLine" x1="150" y1="280" x2="300" y2="200" stroke="#00ff00" stroke-width="2" stroke-dasharray="5,5" opacity="0.6"/>
-                            <line id="blueLine" x1="450" y1="200" x2="300" y2="200" stroke="#0000ff" stroke-width="2" stroke-dasharray="5,5" opacity="0.6"/>
-                            <rect x="250" y="300" width="100" height="40" fill="#333" rx="5" opacity="0.8"/>
-                            <text id="rgbValue" x="300" y="325" text-anchor="middle" font-family="monospace" font-size="14" fill="#fff">RGB(128,128,128)</text>
-                            <text x="300" y="370" text-anchor="middle" font-family="Arial" font-size="12" fill="#666">Drag the colored circles to mix RGB colors</text>
-                        </svg>
+                            </svg>
+                        </div>
+                        <div class="note-section">
+                            <div class="note-label"><i>笔记</i><span>Note</span></div>
+                            <div class="svg4-notes" style="font:14px/1.6 system-ui,sans-serif; color:#111;">
+                                <ol style="margin:0; padding-left:18px;">
+                                    <li>The first step is to draw a canvas of several by several centimeters.</li>
+                                    <li>The second step is to establish the X and Y axes on the canvas.</li>
+                                    <li>The third step is to draw yellow and cyan curves based on the Probability Density.</li>
+                                    <li>The fourth step is to draw two dotted lines at 0.3 to the left and right of 1 on the X-axis.</li>
+                                    <li>The fifth step is to establish a function to describe the shaded area where the two curves overlap.</li>
+                                    <li>The sixth step is to make marks and use CSS to beautify and animate them.</li>
+                                </ol>
+                                <div class="process-link" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db;">
+                                    <h4 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 16px;">📖 制作过程详解</h4>
+                                    <p style="margin: 0 0 12px 0; color: #555; font-size: 14px; line-height: 1.5;">探索这个SVG图形的完整制作流程，包括每个步骤的中间效果和详细说明。</p>
+                                    <a href="svg4-process.html" class="process-btn">🔍 查看详细制作过程</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="note-section">
-                        <div class="note-label"><i>笔记</i><span>Note</span></div>
-                        <div class="svg4-notes" style="font:14px/1.6 system-ui,sans-serif; color:#111;">
-                            <ol style="margin:0; padding-left:18px;">
-                                <li>First, tell it that I want to draw four circles with different centers and different radii.</li>
-                                <li>Second, tell it that what I want to show is the interaction of the three primary colors.</li>
-                                <li>Third, tell it that I hope to make it interactive using D3 and CSS.</li>
-                            </ol>
-                            <div class="process-link" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db;">
-                                <h4 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 16px;">📖 制作过程详解</h4>
-                                <a href="svg5-process.html" class="process-btn">🔍 查看详细制作过程</a>
+
+                    <div class="svg-card">
+                        <div class="svg-header"><div class="svg-title">SVG five</div><div class="svg-number">5</div></div>
+                        <div class="svg-container">
+                            <svg id="svg5" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 600 400">
+                                <defs>
+                                    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                        <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                                    </filter>
+                                    <linearGradient id="redGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff0000" stop-opacity="0.8"/><stop offset="100%" stop-color="#ff6666" stop-opacity="0.8"/></linearGradient>
+                                    <linearGradient id="greenGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00ff00" stop-opacity="0.8"/><stop offset="100%" stop-color="#66ff66" stop-opacity="0.8"/></linearGradient>
+                                    <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0000ff" stop-opacity="0.8"/><stop offset="100%" stop-color="#6666ff" stop-opacity="0.8"/></linearGradient>
+                                </defs>
+                                <rect x="0" y="0" width="600" height="400" fill="#f8f9fa"/>
+                                <text x="300" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#333" font-weight="bold">three-primary colours</text>
+                                <circle id="mixCircle" cx="300" cy="200" r="80" fill="rgb(128,128,128)" filter="url(#glow)" stroke="#333" stroke-width="2"/>
+                                <g id="colorControls">
+                                    <g class="color-control" data-color="red">
+                                        <circle id="redCircle" cx="150" cy="120" r="40" fill="url(#redGradient)" stroke="#cc0000" stroke-width="3" cursor="move" filter="url(#glow)"/>
+                                        <text x="150" y="125" text-anchor="middle" font-family="Arial" font-size="14" fill="#fff" font-weight="bold">R</text>
+                                        <circle id="redHandle" cx="150" cy="120" r="8" fill="#fff" stroke="#cc0000" stroke-width="2" cursor="move"/>
+                                    </g>
+                                    <g class="color-control" data-color="green">
+                                        <circle id="greenCircle" cx="150" cy="280" r="40" fill="url(#greenGradient)" stroke="#00cc00" stroke-width="3" cursor="move" filter="url(#glow)"/>
+                                        <text x="150" y="285" text-anchor="middle" font-family="Arial" font-size="14" fill="#fff" font-weight="bold">G</text>
+                                        <circle id="greenHandle" cx="150" cy="280" r="8" fill="#fff" stroke="#00cc00" stroke-width="2" cursor="move"/>
+                                    </g>
+                                    <g class="color-control" data-color="blue">
+                                        <circle id="blueCircle" cx="450" cy="200" r="40" fill="url(#blueGradient)" stroke="#0000cc" stroke-width="3" cursor="move" filter="url(#glow)"/>
+                                        <text x="450" y="205" text-anchor="middle" font-family="Arial" font-size="14" fill="#fff" font-weight="bold">B</text>
+                                        <circle id="blueHandle" cx="450" cy="200" r="8" fill="#fff" stroke="#0000cc" stroke-width="2" cursor="move"/>
+                                    </g>
+                                </g>
+                                <line id="redLine" x1="150" y1="120" x2="300" y2="200" stroke="#ff0000" stroke-width="2" stroke-dasharray="5,5" opacity="0.6"/>
+                                <line id="greenLine" x1="150" y1="280" x2="300" y2="200" stroke="#00ff00" stroke-width="2" stroke-dasharray="5,5" opacity="0.6"/>
+                                <line id="blueLine" x1="450" y1="200" x2="300" y2="200" stroke="#0000ff" stroke-width="2" stroke-dasharray="5,5" opacity="0.6"/>
+                                <rect x="250" y="300" width="100" height="40" fill="#333" rx="5" opacity="0.8"/>
+                                <text id="rgbValue" x="300" y="325" text-anchor="middle" font-family="monospace" font-size="14" fill="#fff">RGB(128,128,128)</text>
+                                <text x="300" y="370" text-anchor="middle" font-family="Arial" font-size="12" fill="#666">Drag the colored circles to mix RGB colors</text>
+                            </svg>
+                        </div>
+                        <div class="note-section">
+                            <div class="note-label"><i>笔记</i><span>Note</span></div>
+                            <div class="svg4-notes" style="font:14px/1.6 system-ui,sans-serif; color:#111;">
+                                <ol style="margin:0; padding-left:18px;">
+                                    <li>First, tell it that I want to draw four circles with different centers and different radii.</li>
+                                    <li>Second, tell it that what I want to show is the interaction of the three primary colors.</li>
+                                    <li>Third, tell it that I hope to make it interactive using D3 and CSS.</li>
+                                </ol>
+                                <div class="process-link" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #3498db;">
+                                    <h4 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 16px;">📖 制作过程详解</h4>
+                                    <a href="svg5-process.html" class="process-btn">🔍 查看详细制作过程</a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="assignment-section">
-        <h2 class="section-title">Part 4: Complex Data Visualization (Heatmap)</h2>
-        <div id="part4-container">
-            <div class="controls">
-                <div class="search-box">
-                    <input type="text" id="search-input" placeholder="Search method or attack type...">
-                    <div class="search-suggestions" id="search-suggestions"></div>
+        <div class="assignment-section" id="section-part4">
+            <h2 class="section-title">Part 4: Complex Data Visualization (Heatmap)</h2>
+            <div id="part4-container">
+                <div class="controls">
+                    <div class="search-box">
+                        <input type="text" id="search-input" placeholder="Search method or attack type...">
+                        <div class="search-suggestions" id="search-suggestions"></div>
+                    </div>
+                    <button id="toggle-stats">statistical information</button>
                 </div>
-                <button id="toggle-stats">statistical information</button>
-            </div>
-            <div id="heatmap-container"></div>
-            <div id="legend">
-                <div class="legend-item"><div class="legend-color" style="background-color: hsl(0, 80%, 60%)"></div><span>low rate</span></div>
-                <div class="legend-item"><div class="legend-color" style="background-color: hsl(60, 80%, 60%)"></div><span>middle rate</span></div>
-                <div class="legend-item"><div class="legend-color" style="background-color: hsl(120, 80%, 60%)"></div><span>high rate</span></div>
-            </div>
-            <div id="stats-panel" class="stats-panel hidden">
-                <h3 style="text-align:center; color:#2c3e50; margin-bottom:15px;">Performance Statistics</h3>
-                <div class="stats-grid" id="stats-grid"></div>
+                <div id="heatmap-container"></div>
+                <div id="legend">
+                    <div class="legend-item"><div class="legend-color" style="background-color: hsl(0, 80%, 60%)"></div><span>low rate</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: hsl(60, 80%, 60%)"></div><span>middle rate</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background-color: hsl(120, 80%, 60%)"></div><span>high rate</span></div>
+                </div>
+                <div id="stats-panel" class="stats-panel hidden">
+                    <h3 style="text-align:center; color:#2c3e50; margin-bottom:15px;">Performance Statistics</h3>
+                    <div class="stats-grid" id="stats-grid"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+        // 侧边栏功能
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            // 侧边栏切换
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+            });
+            
+            // 导航项点击事件
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // 移除所有active类
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    
+                    // 添加active类到当前项
+                    item.classList.add('active');
+                    
+                    // 获取目标部分
+                    const targetId = item.getAttribute('data-target');
+                    const targetElement = document.getElementById(targetId);
+                    
+                    // 滚动到目标部分
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        
+                        // 在移动设备上关闭侧边栏
+                        if (window.innerWidth <= 1024) {
+                            sidebar.classList.remove('open');
+                        }
+                    }
+                });
+            });
+            
+            // 点击主内容区域关闭移动设备上的侧边栏
+            document.querySelector('.main-content').addEventListener('click', () => {
+                if (window.innerWidth <= 1024 && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                }
+            });
+        });
+
+        // 全局导航功能
+        function navigateToSection() {
+            const input = document.getElementById('navInput').value.toLowerCase().trim();
+            let targetId = '';
+
+            // 简单匹配逻辑
+            if(input.includes('1') || input.includes('psi')) targetId = 'section-part1';
+            else if(input.includes('2') || input.includes('table')) targetId = 'section-part2';
+            else if(input.includes('3') || input.includes('icon')) targetId = 'section-part3';
+            else if(input.includes('4') || input.includes('heat')) targetId = 'section-part4';
+            else if(input.includes('overview')) targetId = 'overview';
+
+            if(targetId) {
+                const element = document.getElementById(targetId);
+                if(element) {
+                    element.scrollIntoView({behavior: 'smooth', block: 'start'});
+                    // 高亮一下目标区域
+                    element.style.transition = 'box-shadow 0.5s ease';
+                    element.style.boxShadow = '0 0 20px rgba(52, 152, 219, 0.8)';
+                    setTimeout(() => {
+                        element.style.boxShadow = '0 12px 30px rgba(0,0,0,0.08)';
+                    }, 1500);
+                    
+                    // 更新侧边栏active状态
+                    document.querySelectorAll('.nav-item').forEach(item => {
+                        item.classList.remove('active');
+                        if (item.getAttribute('data-target') === targetId) {
+                            item.classList.add('active');
+                        }
+                    });
+                }
+            } else {
+                alert('Please enter "overview", 1, 2, 3, or 4 (or keywords like "psi", "heatmap")');
+            }
+        }
+
+        // 绑定回车键事件
+        document.getElementById('navInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') navigateToSection();
+        });
+
+
         document.addEventListener('DOMContentLoaded', () => {
 
             // --- Part 1 JS: Singapore PSI Data Fetch ---
